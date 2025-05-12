@@ -3,37 +3,41 @@ import InteractiveWrapper from './InteractiveWrapper'
 import useDynamicControls from '../Hooks/useDynamicControls'
 
 
-
-export default function ClickCheck({ objects, selected, setSelected, hovered, setHovered }) {
-  if (!objects) return null;
-
+export default function ClickCheck({
+  models,
+  setSelectedId,
+  hovered,
+  setHovered,
+  mode
+}) {
   return (
     <>
-      {objects.map(({ id, name, Component, defaults }) => {
-        const { position, rotation, scale } = useDynamicControls(id, defaults);
-        // console.log('LEVA CONTROLLED:', id, 'position:', position, 'rotation:', rotation);
-
+      {models.map(({ id, name, Component, defaults, visible, selected }) => {
+        const isHovered = hovered === id
+        const { position, rotation } = useDynamicControls(id, defaults, id, mode)
 
         return (
           <InteractiveWrapper
             key={id}
             id={id}
             name={name}
-            selected={selected === id}
-            hovered={hovered === id}
-            onClick={() => setSelected(id)}
+            selected={selected}
+            hovered={isHovered}
+            onClick={() => setSelectedId(id)}
             onPointerOver={() => setHovered(id)}
             onPointerOut={() => setHovered(null)}
           >
-            <Component
+            <mesh
+              visible={visible}
+              scale={selected ? 1.3 : 1}
               position={position}
               rotation={rotation}
-              color={selected === id ? 'black' : hovered === id ? 'orange' : undefined}
-              
-            />
+            >
+              <Component />
+            </mesh>
           </InteractiveWrapper>
         )
       })}
     </>
-  );
+  )
 }

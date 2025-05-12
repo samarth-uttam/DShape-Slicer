@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { useEffect, useRef, useState } from 'react';
 import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF } from '@react-three/drei';
 import { TransformControls } from '@react-three/drei';
+import { Eye, EyeOff } from 'lucide-react'
 
 import { Leva } from 'leva'
 
@@ -228,15 +229,87 @@ function ThreeViewer() {
 
   const [selected, setSelected] = useState(null)
   const [hovered, setHovered] = useState(null)
+const [selectedObjectId, setSelectedObjectId] = useState(null)
+
+const [mode, setMode] = useState('translate')
 
   const objects = getSceneObjects()
 
+  const [models, setModels] = useState(() =>
+  getSceneObjects().map(obj => ({
+    id: obj.id,
+    name: obj.name,
+    visible: true,
+    selected: false
+  }))
+)
+
+function toggleVisibility(id) {
+  setModels(models => models.map(m =>
+    m.id === id ? { ...m, visible: !m.visible } : m
+  ))
+}
+
+function selectModel(id) {
+  setModels(models => models.map(m =>
+    ({ ...m, selected: m.id === id }))
+  )
+  setSelectedObjectId(id) // also update Leva control target
+}
 
   const handlePointerMissed = handlePointerMissedFactory(setSelected);
 
   return (
     <>
     <Leva titleBar={{ title: 'Positional Controls', drag: true }} collapsed={false} />
+
+ <div style={{
+  position: 'absolute',
+  top: '50%',
+  left: 10,
+  transform: 'translateY(-50%)',
+  background: 'rgba(30, 30, 30, 0.9)',         // more solid dark background
+  border: '1px solid rgba(255,255,255,0.15)',
+  boxShadow: '0 4px 20px rgba(0,0,0,0.3)',     // soft shadow for contrast
+  padding: '12px',
+  borderRadius: '10px',
+  color: 'white',
+  fontFamily: 'monospace',
+  fontSize: '14px',
+  zIndex: 10,
+  maxHeight: '80vh',
+  overflowY: 'auto',
+  width: '200px'
+}}>
+
+
+  {models.map(model => (
+   <div key={model.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+  <span
+  onClick={() => toggleVisibility(model.id)}
+  style={{
+    cursor: 'pointer',
+    marginRight: '10px',
+    color: model.visible ? 'orange' : 'gray'
+  }}
+>
+  {model.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+</span>
+  <span
+    onClick={() => selectModel(model.id)}
+    style={{
+      cursor: 'pointer',
+      fontWeight: model.selected ? 'bold' : 'normal',
+      textDecoration: model.selected ? 'underline' : 'none'
+    }}
+  >
+    {model.name}
+  </span>
+</div>
+
+
+  ))}
+</div>
 
     {/* <TestControl /> */}
     <SceneCanvas onPointerMissed={handlePointerMissed}>
@@ -250,16 +323,19 @@ function ThreeViewer() {
        */}
 
 <ClickCheck
-        objects={objects}
-        selected={selected}
-        setSelected={setSelected}
-        hovered={hovered}
-        setHovered={setHovered}
-      />
+  models={objects.map(obj => ({
+    ...obj,
+    ...models.find(m => m.id === obj.id) // merge model state into object config
+  }))}
+  setSelectedId={setSelectedObjectId}
+  hovered={hovered}
+  setHovered={setHovered}
+  mode={mode}
+/>
 
       <AxisHelper size={500} /> {/* Global axis here */}
       <CameraControls enableDamping={false} enablePan={true} />
-      <Stats/>
+      {/* <Stats/> */}
     </SceneCanvas>
 
     </>
