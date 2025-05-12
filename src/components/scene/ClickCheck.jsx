@@ -10,8 +10,8 @@ export default function ClickCheck({ objects, selected, setSelected, hovered, se
   return (
     <>
       {objects.map(({ id, name, Component, defaults }) => {
-        const { position, rotation } = useDynamicControls(id, defaults)
-        console.log('LEVA CONTROLLED:', id, 'position:', position, 'rotation:', rotation);
+        const { position, rotation, scale } = useDynamicControls(id, defaults);
+        // console.log('LEVA CONTROLLED:', id, 'position:', position, 'rotation:', rotation);
 
 
         return (

@@ -236,7 +236,8 @@ function ThreeViewer() {
 
   return (
     <>
-    <Leva collapsed={false} />
+    <Leva titleBar={{ title: 'Positional Controls', drag: true }} collapsed={false} />
+
     {/* <TestControl /> */}
     <SceneCanvas onPointerMissed={handlePointerMissed}>
       {/* <Canvas style={{ width: '100%', height: '100%' }}> */}
