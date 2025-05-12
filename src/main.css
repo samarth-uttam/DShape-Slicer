@@ -1,0 +1,60 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+  }
+  
+  .container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .top {
+    height: 20%;
+    width: 100%;
+    background-color: lightblue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .middle {
+    height: 70%;
+    width: 100%;
+    display: flex;
+  }
+  
+  .viewer {
+    width: 100%;
+    height: 100%;
+    background-color: lightgray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .settings {
+    width: 0%;
+    height: 100%;
+    background-color: peachpuff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .bottom {
+    height: 10%;
+    width: 100%;
+    background-color: lightgreen;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
