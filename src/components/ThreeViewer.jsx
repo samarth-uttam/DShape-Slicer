@@ -14,7 +14,7 @@ import * as THREE from 'three';
 import { useEffect, useRef, useState } from 'react';
 import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF } from '@react-three/drei';
 import { TransformControls } from '@react-three/drei';
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Layers3, ScanEye } from 'lucide-react'
 
 import { Leva } from 'leva'
 
@@ -41,10 +41,9 @@ import ClickCheck from './scene/ClickCheck'
 // Rendering the Icosahedron
 function Icosahedron({ color = 'hotpink',position , rotation}) {
   return (
-    <mesh position={position} rotation={rotation}>
+   
       <icosahedronGeometry args={[1, 2]} />
-      <meshStandardMaterial color={color} />
-    </mesh>
+      
   )
 }
 
@@ -53,10 +52,10 @@ function Icosahedron({ color = 'hotpink',position , rotation}) {
 
 function SecondBox({ color = 'blue', position , rotation}) {
   return (
-    <mesh position={position} rotation={rotation}>
+    
       <boxGeometry args={[2, 2, 2]} />
-      <meshStandardMaterial color={color} />
-    </mesh>
+      
+   
   )
 }
 
@@ -65,10 +64,10 @@ function SecondBox({ color = 'blue', position , rotation}) {
 // Rendering the TorusKnot to the scene
 function TorusKnot({ color = 'green', position , rotation}) {
   return (
-    <mesh position={position} rotation={rotation}>
+    
       <torusKnotGeometry args={[1, 0.4, 100, 16]} />
-      <meshStandardMaterial color={color} wireframe={true}/>
-    </mesh>
+      
+  
   );
 }
 
@@ -235,14 +234,40 @@ const [mode, setMode] = useState('translate')
 
   const objects = getSceneObjects()
 
-  const [models, setModels] = useState(() =>
+ const [models, setModels] = useState(() =>
   getSceneObjects().map(obj => ({
     id: obj.id,
     name: obj.name,
     visible: true,
-    selected: false
+    selected: false,
+    renderMode: 'solid' // solid | wireframe | hidden
   }))
 )
+
+function toggleVisibility(id) {
+  setModels(models => models.map(m =>
+    m.id === id ? { ...m, visible: !m.visible } : m
+  ))
+}
+
+function selectModel(id) {
+  setModels(models => models.map(m =>
+    ({ ...m, selected: m.id === id }))
+  )
+  setSelectedObjectId(id)
+}
+
+function cycleRenderMode(id) {
+  setModels(models =>
+    models.map(m => {
+      if (m.id !== id) return m
+      const next =
+        m.renderMode === 'solid' ? 'wireframe' :
+        m.renderMode === 'wireframe' ? 'hidden' : 'solid'
+      return { ...m, renderMode: next }
+    })
+  )
+}
 
 function toggleVisibility(id) {
   setModels(models => models.map(m =>
@@ -268,9 +293,9 @@ function selectModel(id) {
   top: '50%',
   left: 10,
   transform: 'translateY(-50%)',
-  background: 'rgba(30, 30, 30, 0.9)',         // more solid dark background
+  background: 'rgba(30, 30, 30, 0.9)',
   border: '1px solid rgba(255,255,255,0.15)',
-  boxShadow: '0 4px 20px rgba(0,0,0,0.3)',     // soft shadow for contrast
+  boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
   padding: '12px',
   borderRadius: '10px',
   color: 'white',
@@ -279,35 +304,35 @@ function selectModel(id) {
   zIndex: 10,
   maxHeight: '80vh',
   overflowY: 'auto',
-  width: '200px'
+  width: '210px'
 }}>
-
-
   {models.map(model => (
-   <div key={model.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-  <span
-  onClick={() => toggleVisibility(model.id)}
-  style={{
-    cursor: 'pointer',
-    marginRight: '10px',
-    color: model.visible ? 'orange' : 'gray'
-  }}
->
-  {model.visible ? <Eye size={16} /> : <EyeOff size={16} />}
-</span>
-  <span
-    onClick={() => selectModel(model.id)}
-    style={{
-      cursor: 'pointer',
-      fontWeight: model.selected ? 'bold' : 'normal',
-      textDecoration: model.selected ? 'underline' : 'none'
-    }}
-  >
-    {model.name}
-  </span>
-</div>
-
-
+    <div key={model.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+      <span onClick={() => toggleVisibility(model.id)} style={{ cursor: 'pointer', marginRight: '10px' }}>
+        {model.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+      </span>
+      <span onClick={() => cycleRenderMode(model.id)} style={{
+        cursor: 'pointer',
+        marginRight: '10px',
+        color:
+          model.renderMode === 'solid' ? 'white' :
+          model.renderMode === 'wireframe' ? 'deepskyblue' : 'gray'
+      }}>
+        {model.renderMode === 'solid' && <Layers3 size={16} />}
+        {model.renderMode === 'wireframe' && <ScanEye size={16} />}
+        {model.renderMode === 'hidden' && <EyeOff size={16} />}
+      </span>
+      <span
+        onClick={() => selectModel(model.id)}
+        style={{
+          cursor: 'pointer',
+          fontWeight: model.selected ? 'bold' : 'normal',
+          textDecoration: model.selected ? 'underline' : 'none'
+        }}
+      >
+        {model.name}
+      </span>
+    </div>
   ))}
 </div>
 
@@ -325,13 +350,14 @@ function selectModel(id) {
 <ClickCheck
   models={objects.map(obj => ({
     ...obj,
-    ...models.find(m => m.id === obj.id) // merge model state into object config
+    ...models.find(m => m.id === obj.id)
   }))}
   setSelectedId={setSelectedObjectId}
   hovered={hovered}
   setHovered={setHovered}
   mode={mode}
 />
+
 
       <AxisHelper size={500} /> {/* Global axis here */}
       <CameraControls enableDamping={false} enablePan={true} />
