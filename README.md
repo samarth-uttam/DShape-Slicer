@@ -1,12 +1,15 @@
-# React + Vite
+This is a simle web app designed for DShape Ltd. using React with three.js library. 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The website serves a couple of applications : 
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+  - Uploading the model and objecr manuplation on the print plate
+  - using Python based libraries for print optimisation 
+  - Choosing print settings 
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+  The website is in development phase. 
+  
+  All the copyrights and licesnes belong to DShape Limited based in Hong Kong. 
+
+For any queries, please contact **Samarth Uttam** at [samarth.uttamm@Dshape@com.hk](mailto:samarth.uttamm@Dshape@com.hk).

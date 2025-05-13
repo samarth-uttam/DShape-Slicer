@@ -67,7 +67,7 @@ function TorusKnot({ color = 'green', position , rotation}) {
   return (
     <mesh position={position} rotation={rotation}>
       <torusKnotGeometry args={[1, 0.4, 100, 16]} />
-      <meshStandardMaterial color={color} wireframe={true}/>
+      <meshStandardMaterial color={color} wireframe={false}/>
     </mesh>
   );
 }
