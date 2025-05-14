@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF } from '@react-three/drei';
 import { TransformControls } from '@react-three/drei';
 import { Eye, EyeOff, Layers3, ScanEye } from 'lucide-react'
-
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Leva } from 'leva'
 
 
@@ -224,25 +224,34 @@ function handlePointerMissedFactory(setSelected) {
 
 
 
+
+
 function ThreeViewer() {
 
-  const [selected, setSelected] = useState(null)
-  const [hovered, setHovered] = useState(null)
+const [selected, setSelected] = useState(null)
+const [hovered, setHovered] = useState(null)
 const [selectedObjectId, setSelectedObjectId] = useState(null)
-
+const [highlightColor, setHighlightColor] = useState('#ffa500') // Orange
+const [wireframeColor, setWireframeColor] = useState('#00ffff') // Cyan
 const [mode, setMode] = useState('translate')
+const objects = getSceneObjects()
+const [collapsed, setCollapsed] = useState(false) // <-- inside ThreeViewer
+const panelWidth = collapsed ? 40 : 210
 
-  const objects = getSceneObjects()
 
  const [models, setModels] = useState(() =>
   getSceneObjects().map(obj => ({
-    id: obj.id,
-    name: obj.name,
+    ...obj,                    // includes id, name, Component, defaults
     visible: true,
     selected: false,
-    renderMode: 'solid' // solid | wireframe | hidden
+    renderMode: 'solid'
   }))
 )
+
+function setAllVisibility(state) {
+  setModels(models => models.map(m => ({ ...m, visible: state })))
+}
+
 
 function toggleVisibility(id) {
   setModels(models => models.map(m =>
@@ -250,12 +259,7 @@ function toggleVisibility(id) {
   ))
 }
 
-function selectModel(id) {
-  setModels(models => models.map(m =>
-    ({ ...m, selected: m.id === id }))
-  )
-  setSelectedObjectId(id)
-}
+
 
 function cycleRenderMode(id) {
   setModels(models =>
@@ -276,65 +280,196 @@ function toggleVisibility(id) {
 }
 
 function selectModel(id) {
-  setModels(models => models.map(m =>
-    ({ ...m, selected: m.id === id }))
+  setModels(models =>
+    models.map(m => ({
+      ...m,
+      selected: m.id === id ? !m.selected : false
+    }))
   )
-  setSelectedObjectId(id) // also update Leva control target
+
+  setSelectedObjectId(prev => (prev === id ? null : id))
 }
+
 
   const handlePointerMissed = handlePointerMissedFactory(setSelected);
 
   return (
     <>
-    <Leva titleBar={{ title: 'Positional Controls', drag: true }} collapsed={false} />
+    <Leva titleBar={{ title: 'Positional Controls', drag: true }} collapsed={true} />
 
- <div style={{
+
+<div style={{
   position: 'absolute',
   top: '50%',
-  left: 10,
+  left: 0,
   transform: 'translateY(-50%)',
   background: 'rgba(30, 30, 30, 0.9)',
-  border: '1px solid rgba(255,255,255,0.15)',
+  borderRight: '1px solid rgba(255,255,255,0.15)',
   boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-  padding: '12px',
-  borderRadius: '10px',
+  padding: collapsed ? '6px' : '12px',
+  borderRadius: '0 10px 10px 0',
   color: 'white',
   fontFamily: 'monospace',
   fontSize: '14px',
   zIndex: 10,
   maxHeight: '80vh',
   overflowY: 'auto',
-  width: '210px'
+  width: `${panelWidth}px`,
+  transition: 'width 0.3s ease'
 }}>
-  {models.map(model => (
-    <div key={model.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-      <span onClick={() => toggleVisibility(model.id)} style={{ cursor: 'pointer', marginRight: '10px' }}>
-        {model.visible ? <Eye size={16} /> : <EyeOff size={16} />}
-      </span>
-      <span onClick={() => cycleRenderMode(model.id)} style={{
-        cursor: 'pointer',
-        marginRight: '10px',
-        color:
-          model.renderMode === 'solid' ? 'white' :
-          model.renderMode === 'wireframe' ? 'deepskyblue' : 'gray'
+
+  {/* Collapse Button */}
+  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
+    <button onClick={() => setCollapsed(!collapsed)} style={{
+      background: 'none',
+      border: 'none',
+      color: 'white',
+      cursor: 'pointer'
+    }}>
+      {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+    </button>
+  </div>
+
+  {!collapsed && (
+    <>
+      <div style={{
+        fontWeight: 'bold',
+        fontSize: '13px',
+        marginBottom: '10px',
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        paddingBottom: '4px'
       }}>
-        {model.renderMode === 'solid' && <Layers3 size={16} />}
-        {model.renderMode === 'wireframe' && <ScanEye size={16} />}
-        {model.renderMode === 'hidden' && <EyeOff size={16} />}
-      </span>
-      <span
-        onClick={() => selectModel(model.id)}
-        style={{
-          cursor: 'pointer',
-          fontWeight: model.selected ? 'bold' : 'normal',
-          textDecoration: model.selected ? 'underline' : 'none'
-        }}
-      >
-        {model.name}
-      </span>
-    </div>
-  ))}
+        List of Objects
+      </div>
+
+      {/* 🔁 Model list */}
+      {models.map(model => (
+        <div key={model.id} style={{
+          display: 'flex',
+          alignItems: 'center',
+          marginBottom: '8px',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span onClick={() => cycleRenderMode(model.id)} style={{
+              cursor: 'pointer',
+              marginRight: '10px',
+              color:
+                model.renderMode === 'solid' ? 'white' :
+                model.renderMode === 'wireframe' ? 'deepskyblue' : 'gray'
+            }}>
+              {model.renderMode === 'solid' && <Layers3 size={16} />}
+              {model.renderMode === 'wireframe' && <ScanEye size={16} />}
+              {model.renderMode === 'hidden' && <EyeOff size={16} />}
+            </span>
+
+            <span
+              onClick={() => selectModel(model.id)}
+              style={{
+                cursor: 'pointer',
+                fontWeight: model.selected ? 'bold' : 'normal',
+                textDecoration: model.selected ? 'underline' : 'none',
+                userSelect: 'none'
+              }}
+            >
+              {model.name}
+            </span>
+          </div>
+        </div>
+      ))}
+
+      {/* 🎨 Color pickers in-line */}
+      <div style={{
+        fontSize: '12px',
+        marginTop: '10px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <label style={{ marginRight: '4px' }}>Highlight</label>
+        <input
+          type="color"
+          value={highlightColor}
+          onChange={(e) => setHighlightColor(e.target.value)}
+          style={{
+            width: '20px',
+            height: '20px',
+            padding: 0,
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer'
+          }}
+        />
+      </div>
+
+      <div style={{
+        fontSize: '12px',
+        marginTop: '6px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <label style={{ marginRight: '4px' }}>Transparent</label>
+        <input
+          type="color"
+          value={wireframeColor}
+          onChange={(e) => setWireframeColor(e.target.value)}
+          style={{
+            width: '20px',
+            height: '20px',
+            padding: 0,
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer'
+          }}
+        />
+      </div>
+
+      {/* ✅ Show/Hide buttons at bottom */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: '12px',
+        gap: '6px'
+      }}>
+        <button
+          onClick={() => setAllVisibility(true)}
+          title="Show All"
+          style={{
+            flex: 1,
+            padding: '4px',
+            fontSize: '12px',
+            backgroundColor: '#1e1e1e',
+            color: 'white',
+            border: '1px solid rgba(255,255,255,0.2)',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Show
+        </button>
+        <button
+          onClick={() => setAllVisibility(false)}
+          title="Hide All"
+          style={{
+            flex: 1,
+            padding: '4px',
+            fontSize: '12px',
+            backgroundColor: '#1e1e1e',
+            color: 'white',
+            border: '1px solid rgba(255,255,255,0.2)',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Hide
+        </button>
+      </div>
+    </>
+  )}
 </div>
+
 
     {/* <TestControl /> */}
     <SceneCanvas onPointerMissed={handlePointerMissed}>
@@ -348,15 +483,17 @@ function selectModel(id) {
        */}
 
 <ClickCheck
-  models={objects.map(obj => ({
-    ...obj,
-    ...models.find(m => m.id === obj.id)
-  }))}
+  models={models} // ✅ simpler and reactive
   setSelectedId={setSelectedObjectId}
   hovered={hovered}
   setHovered={setHovered}
   mode={mode}
+  highlightColor={highlightColor}
+  wireframeColor={wireframeColor}
+  selectedId={selectedObjectId}
 />
+
+
 
 
       <AxisHelper size={500} /> {/* Global axis here */}
