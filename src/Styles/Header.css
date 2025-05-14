@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
+
+.top {
+  width: 100%;
+  background-color: #1e1f28; /* Dark navy */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 2rem;
+ /* border-bottom: 1px solid rgba(255, 255, 255, 0.05); */
+  position: relative;
+  z-index: 20;
+}
+
+.nav-link {
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  color: #f8fafc;
+  text-decoration: none;
+  letter-spacing: 0.6px;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #cbd5e1;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+.container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.middle {
+  height: 85%;
+  width: 100%;
+  display: flex;
+}
+
+.viewer {
+  width: 100%;
+  height: 100%;
+  background-color: lightgray;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.settings {
+  width: 0%;
+  height: 100%;
+  background-color: peachpuff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bottom {
+  height: 5%;
+  width: 100%;
+  background-color: lightgreen;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.top-section {
+  width: 100%;
+  background-color: lightblue;
+}
+
+.top__title {
+  text-align: left;
+  padding: 1rem 2rem;
+  color: #1F2937;
+}
+
+
+.menu-popup {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  background-color: #1e293b;
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  min-width: 160px;
+  z-index: 100;
+}
+
+.menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+}
+
+.menu-icon:hover {
+  background-color: rgba(255, 255, 255, 0.15); /* subtle light on hover */
+}
+
+.menu-icon.active {
+  background-color: #3b4252; /* soft lighter tone of header */
+}
+
+
+
+.nav-link {
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  color: #f8fafc;
+  text-decoration: none;
+  letter-spacing: 0.6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover {
+  background-color: #334155; /* Soft slate highlight */
+  color: #e2e8f0;
+}

@@ -1,11 +1,20 @@
 // src/sections/HeaderSection.jsx
+
+import '../Styles/Header.css';
+
+import Header from "../components/Header";
+
 function HeaderSection() {
-    return (
+  return (
+    <div className="top-section">
+
+
       <div className="top">
-        This is the Header version 3 on my main mac
+        <Header />
       </div>
-    );
-  }
-  
-  export default HeaderSection;
-     
+      
+    </div>
+  );
+}
+
+export default HeaderSection;

@@ -1,10 +1,7 @@
-// src/components/ThreeViewer.jsx
 
-
-// clearing the console
-
+// clearing the console for debugging purposes. Chrome does not clear the console when you refresh the page.
+// this is a workaround to clear the console when the page is refreshed.
 console.clear()
-
 
 
 //importing standard libraries 
@@ -15,27 +12,13 @@ import { useEffect, useRef, useState } from 'react';
 import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF } from '@react-three/drei';
 import { TransformControls } from '@react-three/drei';
 import { Eye, EyeOff } from 'lucide-react'
-
 import { Leva } from 'leva'
-
-
-
-
-// the test control to see the values in the console and see if leva works or not
-
-import { useControls } from 'leva'
-function TestControl() {
-  const { test } = useControls('Debug', {
-    test: { value: 5, min: 0, max: 10, step: 1 }
-  })
-  console.log('Test value:', test)
-  return null
-}
 
 
 
 //importing different .jsx files from the same project 
 import ClickCheck from './scene/ClickCheck'
+
 
 
 // Rendering the Icosahedron
@@ -151,6 +134,57 @@ function DebugCameraLive() {
   return null
 }
 
+// control panel for the models in the scene
+
+function ModelTogglePanel({ models, toggleVisibility, selectModel }) {
+  return (
+    <div style={{
+      position: 'absolute',
+      top: '50%',
+      left: 10,
+      transform: 'translateY(-50%)',
+      background: 'rgba(30, 30, 30, 0.9)',
+      border: '1px solid rgba(255,255,255,0.15)',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+      padding: '12px',
+      borderRadius: '10px',
+      color: 'white',
+      fontFamily: 'monospace',
+      fontSize: '14px',
+      zIndex: 10,
+      maxHeight: '80vh',
+      overflowY: 'auto',
+      width: '200px'
+    }}>
+      <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>List of Objects</div>
+      {models.map(model => (
+        <div key={model.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <span
+            onClick={() => toggleVisibility(model.id)}
+            style={{
+              cursor: 'pointer',
+              marginRight: '10px',
+              color: model.visible ? 'orange' : 'gray'
+            }}
+          >
+            {model.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+          </span>
+          <span
+            onClick={() => selectModel(model.id)}
+            style={{
+              cursor: 'pointer',
+              fontWeight: model.selected ? 'bold' : 'normal',
+              textDecoration: model.selected ? 'underline' : 'none'
+            }}
+          >
+            {model.name}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 
 // orbit camera controller customisation 
 
@@ -229,11 +263,12 @@ function ThreeViewer() {
 
   const [selected, setSelected] = useState(null)
   const [hovered, setHovered] = useState(null)
-const [selectedObjectId, setSelectedObjectId] = useState(null)
+  const [selectedObjectId, setSelectedObjectId] = useState(null)
 
-const [mode, setMode] = useState('translate')
+  const [mode, setMode] = useState('translate')
 
   const objects = getSceneObjects()
+
 
   const [models, setModels] = useState(() =>
   getSceneObjects().map(obj => ({
@@ -261,57 +296,17 @@ function selectModel(id) {
 
   return (
     <>
-    <Leva titleBar={{ title: 'Positional Controls', drag: true }} collapsed={false} />
-
- <div style={{
-  position: 'absolute',
-  top: '50%',
-  left: 10,
-  transform: 'translateY(-50%)',
-  background: 'rgba(30, 30, 30, 0.9)',         // more solid dark background
-  border: '1px solid rgba(255,255,255,0.15)',
-  boxShadow: '0 4px 20px rgba(0,0,0,0.3)',     // soft shadow for contrast
-  padding: '12px',
-  borderRadius: '10px',
-  color: 'white',
-  fontFamily: 'monospace',
-  fontSize: '14px',
-  zIndex: 10,
-  maxHeight: '80vh',
-  overflowY: 'auto',
-  width: '200px'
-}}>
+ <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} />
 
 
-  {models.map(model => (
-   <div key={model.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-  <span
-  onClick={() => toggleVisibility(model.id)}
-  style={{
-    cursor: 'pointer',
-    marginRight: '10px',
-    color: model.visible ? 'orange' : 'gray'
-  }}
->
-  {model.visible ? <Eye size={16} /> : <EyeOff size={16} />}
-</span>
-  <span
-    onClick={() => selectModel(model.id)}
-    style={{
-      cursor: 'pointer',
-      fontWeight: model.selected ? 'bold' : 'normal',
-      textDecoration: model.selected ? 'underline' : 'none'
-    }}
-  >
-    {model.name}
-  </span>
-</div>
+{/* <ModelTogglePanel
+  models={models}
+  toggleVisibility={toggleVisibility}
+  selectModel={selectModel}
+/> */}
 
 
-  ))}
-</div>
-
-    {/* <TestControl /> */}
+  
     <SceneCanvas onPointerMissed={handlePointerMissed}>
       {/* <Canvas style={{ width: '100%', height: '100%' }}> */}
       <ambientLight intensity={0.5} />
