@@ -14,7 +14,7 @@ export default function useDynamicControls(id, defaults = {}) {
       'X Rotation (°)': { value: 0, min: 0, max: 360, step: 30 },
       'Y Rotation (°)': { value: 0, min: 0, max: 360, step: 30 },
       'Z Rotation (°)': { value: 0, min: 0, max: 360, step: 30 }
-    })
+    }) 
   }, { group: id });
 
   return {

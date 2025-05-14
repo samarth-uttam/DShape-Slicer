@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import InteractiveWrapper from './InteractiveWrapper'
-import useDynamicControls from '../Hooks/useDynamicControls'
+import useDynamicControls from '../components/Hooks/useDynamicControls'
 
 
 export default function ClickCheck({

@@ -1,8 +1,8 @@
 // src/sections/HeaderSection.jsx
 
-import '../Styles/Header.css';
+import './Header.css';
 
-import Header from "../components/Header";
+import Header from "./Header";
 
 function HeaderSection() {
   return (

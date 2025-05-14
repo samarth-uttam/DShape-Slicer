@@ -264,9 +264,7 @@ function ThreeViewer() {
   const [selected, setSelected] = useState(null)
   const [hovered, setHovered] = useState(null)
   const [selectedObjectId, setSelectedObjectId] = useState(null)
-
   const [mode, setMode] = useState('translate')
-
   const objects = getSceneObjects()
 
 
@@ -308,14 +306,11 @@ function selectModel(id) {
 
   
     <SceneCanvas onPointerMissed={handlePointerMissed}>
-      {/* <Canvas style={{ width: '100%', height: '100%' }}> */}
       <ambientLight intensity={0.5} />
       <directionalLight position={[2, 2, 2]} />
       <XYGrid />
       
-      {/* <DebugCameraLive/> */}
-      {/* <ClickCheck objects={objects} />
-       */}
+      
 
 <ClickCheck
   models={objects.map(obj => ({
@@ -330,7 +325,15 @@ function selectModel(id) {
 
       <AxisHelper size={500} /> {/* Global axis here */}
       <CameraControls enableDamping={false} enablePan={true} />
+     
+
+
+      {/* // debugging the functions values */}
       {/* <Stats/> */}
+      {/* <DebugCameraLive/> */}
+      {/* <ClickCheck objects={objects} />*/}
+
+
     </SceneCanvas>
 
     </>

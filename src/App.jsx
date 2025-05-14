@@ -1,8 +1,9 @@
 // src/App.jsx
-import './main.css';
+import './Styles/index.css';
+import './Styles/main.css';
 
-import HeaderSection from './sections/HeaderSection';
-import MiddleSection from './sections/MiddleSection';
+import HeaderSection from './Header/HeaderSection';
+import MiddleSection from './Middle/MiddleSection';
 import FooterSection from './sections/FooterSection';
 
 

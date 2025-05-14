@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { UserCircle, Settings2 } from 'lucide-react';
-import '../Styles/Header.css';
+import './Header.css';
 
 export default function Header() {
   const [activeMenu, setActiveMenu] = useState(null);

@@ -1,5 +1,5 @@
 // src/sections/MiddleSection.jsx
-import ThreeViewer from '../components/ThreeViewer';
+import ThreeViewer from '../Middle/ThreeViewerSection/ThreeViewer';
 
 function MiddleSection() {
   return (
