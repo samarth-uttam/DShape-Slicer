@@ -17,10 +17,9 @@ html, body, #root {
 }
 
 .middle {
-  height: 85%;
-  width: 100%;
-  display: flex;
+  flex: 1;      /* ✅ Fills all remaining space */
 }
+
 
 .viewer {
   width: 100%;
@@ -40,14 +39,7 @@ html, body, #root {
   align-items: center;
 }
 
-.bottom {
-  height: 5%;
-  width: 100%;
-  background-color: lightgreen;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+
 
 .top-section {
   width: 100%;

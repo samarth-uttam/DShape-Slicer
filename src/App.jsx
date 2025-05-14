@@ -12,7 +12,7 @@ function App() {
     <div className="container">
       <HeaderSection />
       <MiddleSection />
-      <FooterSection />
+      {/* <FooterSection /> */}
     </div>
   );
 }
