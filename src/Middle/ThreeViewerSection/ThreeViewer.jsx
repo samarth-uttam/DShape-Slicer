@@ -4,27 +4,89 @@
 console.clear()
 
 
+
+
 //importing standard libraries 
 
 import { Canvas, useThree ,useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState , useMemo } from 'react';
 import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF } from '@react-three/drei';
 import { TransformControls } from '@react-three/drei';
 import { Eye, EyeOff } from 'lucide-react'
 import { Leva } from 'leva'
+import { Edges } from '@react-three/drei';
+
 
 
 
 //importing different .jsx files from the same project 
 import ClickCheck from './scene/ClickCheck'
 
+//---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
 
+function FixedBoundingBox({ color = 'gray' }) {
+  return (
+    <mesh position={[1, 2, 0.5]} /* center of 2x2x6 box */>
+      <boxGeometry args={[2, 4, 1]} />
+      <meshStandardMaterial color={color} transparent opacity={0.2} />
+      <Edges scale={1} threshold={15} color="black" />
+    </mesh>
+  );
+}
+
+
+function ThickAxes({ length = 5, radius = 0.05 }) {
+  return (
+    <group>
+      {/* X-axis: red */}
+      <mesh position={[length / 2, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[radius, radius, length, 16]} />
+        <meshBasicMaterial color="red" />
+      </mesh>
+
+      {/* Y-axis: green */}
+      <mesh position={[0, length / 2, 0]}>
+        <cylinderGeometry args={[radius, radius, length, 16]} />
+        <meshBasicMaterial color="green" />
+      </mesh>
+
+      {/* Z-axis: blue */}
+      <mesh position={[0, 0, length / 2]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[radius, radius, length, 16]} />
+        <meshBasicMaterial color="blue" />
+      </mesh>
+    </group>
+  );
+}
+
+
+// Rendering the Original Isocahedron
+
+
+function OriginalCube({
+  color = 'skyblue',
+  position = [1, 1, 1],
+  rotation = [0, 0, 0],
+  edgeColor = 'black'
+}) {
+  return (
+    <mesh position={position} rotation={rotation}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color={color} />
+      <Edges
+        scale={1}         // Slightly outside the box
+        threshold={15}       // Lower = more edge detail
+        color={edgeColor}    // Outline color
+      />
+    </mesh>
+  );
+}
 
 // Rendering the Icosahedron
 function Icosahedron({ color = 'hotpink',position , rotation}) {
   return (
-    <mesh position={position} rotation={rotation}>
+    <mesh position={[position]} rotation={rotation}>
       <icosahedronGeometry args={[1, 2]} />
       <meshStandardMaterial color={color} />
     </mesh>
@@ -77,62 +139,7 @@ function AxisHelper({ size = 100 }) {
 }
 
 
-// making the canvas 
 
-function SceneCanvas({ children , onPointerMissed}) {
-  return (
-    <Canvas
-
-    
-
-      style={{ width: '100%', height: '100%' }}
-      camera={{ position: [10, 10, 15], fov: 50, near: 0.1, far: 1000 }}
-      onPointerMissed={onPointerMissed}
-      >
-        
-      {children}
-    </Canvas>
-  );
-}
-
-
-
-// function to see the camera movement logs in initial setup 
-
-function DebugCameraValues() {
-  const { camera } = useThree()
-
-  useEffect(() => {
-    console.log('Camera Position:', camera.position.toArray())
-    console.log('Camera FOV:', camera.fov)
-    console.log('Camera Near:', camera.near)
-    console.log('Camera Far:', camera.far)
-  }, [camera])
-
-  return null
-}
-
-// check if the camera has moved and display the values if changed 
-
-function DebugCameraLive() {
-  const { camera } = useThree()
-  const lastPos = useRef([0, 0, 0])
-
-  useFrame(() => {
-    const pos = camera.position.toArray()
-    const hasChanged = pos.some((val, i) => val !== lastPos.current[i])
-
-    if (hasChanged) {
-      console.log("Camera Position:", pos)
-      console.log("FOV:", camera.fov)
-      console.log("Near:", camera.near)
-      console.log("Far:", camera.far)
-      lastPos.current = pos
-    }
-  })
-
-  return null
-}
 
 // control panel for the models in the scene
 
@@ -186,7 +193,40 @@ function ModelTogglePanel({ models, toggleVisibility, selectModel }) {
 }
 
 
-// orbit camera controller customisation 
+// Debugging the camera and controls
+
+function CameraDebugger() {
+  const { camera, controls } = useThree()
+
+  useFrame(() => {
+    console.log('Camera position:', camera.position)
+    if (controls) {
+      console.log('Controls target:', controls.target)
+    }
+  })
+
+  return null
+}
+
+
+// making the canvas 
+
+function SceneCanvas({ children , onPointerMissed}) {
+  return (
+    <Canvas
+
+    
+      style={{ width: '100%', height: '100%' }}
+      camera={{ position: [0, 15, 10], fov: 50, near: 0.1, far: 1000 }}
+
+      onPointerMissed={onPointerMissed}
+      >
+        
+      {children}
+    </Canvas>
+  );
+}
+
 
 function CameraControls({
   enableDamping = true,
@@ -194,19 +234,48 @@ function CameraControls({
   enableZoom = true,
   enablePan = true,
   enableRotate = true,
-  ...props
 }) {
+  const { camera, gl } = useThree();
+  const controlsRef = useRef();
+
+  useEffect(() => {
+    if (controlsRef.current) {
+      controlsRef.current.update();
+    }
+  }, []);
+
   return (
     <OrbitControls
+      makeDefault // ✅ This line is critical!
+      ref={controlsRef}
+      args={[camera, gl.domElement]}
+      target={[0, 0, 0]}
       enableDamping={enableDamping}
       dampingFactor={dampingFactor}
       enableZoom={enableZoom}
       enablePan={enablePan}
       enableRotate={enableRotate}
-      {...props}
+      minPolarAngle={0}
+      maxPolarAngle={Math.PI}
+      minAzimuthAngle={-Infinity}
+      maxAzimuthAngle={Infinity}
+      screenSpacePanning={false}
+       zoomSpeed={0.5} 
     />
-  )
+  );
 }
+
+
+
+function LiveCameraLine() {
+  const { camera, controls } = useThree();
+
+  return (
+    <DebugLine from={[camera.position.x, camera.position.y, camera.position.z]} to={controls?.target?.toArray?.() || [0, 0, 0]} color="lime" />
+  );
+}
+
+
 
 // adding the grid to the scene 
 
@@ -221,7 +290,7 @@ function XYGrid() {
       sectionColor="black"
       fadeDistance={50}
       fadeStrength={2}
-      // rotation={[Math.PI / 2, 0, 0]}  // ⬅ Rotate to XY plane
+   rotation={[0, -Math.PI / 2, 0]}
     />
   )
 }
@@ -259,38 +328,11 @@ function handlePointerMissedFactory(setSelected) {
 
 
 
+
+
+
 function ThreeViewer() {
 
-  const [selected, setSelected] = useState(null)
-  const [hovered, setHovered] = useState(null)
-  const [selectedObjectId, setSelectedObjectId] = useState(null)
-  const [mode, setMode] = useState('translate')
-  const objects = getSceneObjects()
-
-
-  const [models, setModels] = useState(() =>
-  getSceneObjects().map(obj => ({
-    id: obj.id,
-    name: obj.name,
-    visible: true,
-    selected: false
-  }))
-)
-
-function toggleVisibility(id) {
-  setModels(models => models.map(m =>
-    m.id === id ? { ...m, visible: !m.visible } : m
-  ))
-}
-
-function selectModel(id) {
-  setModels(models => models.map(m =>
-    ({ ...m, selected: m.id === id }))
-  )
-  setSelectedObjectId(id) // also update Leva control target
-}
-
-  const handlePointerMissed = handlePointerMissedFactory(setSelected);
 
   return (
     <>
@@ -305,27 +347,22 @@ function selectModel(id) {
 
 
   
-    <SceneCanvas onPointerMissed={handlePointerMissed}>
+
+
+<SceneCanvas>
       <ambientLight intensity={0.5} />
+       <CameraControls /> 
       <directionalLight position={[2, 2, 2]} />
-      <XYGrid />
-      
-      
-
-<ClickCheck
-  models={objects.map(obj => ({
-    ...obj,
-    ...models.find(m => m.id === obj.id) // merge model state into object config
-  }))}
-  setSelectedId={setSelectedObjectId}
-  hovered={hovered}
-  setHovered={setHovered}
-  mode={mode}
-/>
-
+      {/* <XYGrid /> */}
       <AxisHelper size={500} /> {/* Global axis here */}
-      <CameraControls enableDamping={false} enablePan={true} />
+      {/* <CameraControls enableDamping={false} enablePan={true} /> */}
+      <OriginalCube color="skyblue" />
+<ThickAxes length={10} radius={0.1} />
      
+      <FixedBoundingBox color="gray" />
+      <CameraDebugger />
+      
+
 
 
       {/* // debugging the functions values */}
