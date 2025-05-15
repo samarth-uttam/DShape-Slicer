@@ -11,11 +11,10 @@ console.clear()
 import { Canvas, useThree ,useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useEffect, useRef, useState , useMemo } from 'react';
-import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF } from '@react-three/drei';
-import { TransformControls } from '@react-three/drei';
+import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF, Edges , TransformControls, PerspectiveCamera} from '@react-three/drei';
 import { Eye, EyeOff } from 'lucide-react'
 import { Leva } from 'leva'
-import { Edges } from '@react-three/drei';
+
 
 
 
@@ -350,18 +349,26 @@ function ThreeViewer() {
 
 
 <SceneCanvas>
+
+
       <ambientLight intensity={0.5} />
-       <CameraControls /> 
+      {/* <CameraControls /> */}
       <directionalLight position={[2, 2, 2]} />
       {/* <XYGrid /> */}
-      <AxisHelper size={500} /> {/* Global axis here */}
-      {/* <CameraControls enableDamping={false} enablePan={true} /> */}
+      <PerspectiveCamera makeDefault position={[5, 5, 5]} fov={50} />
+      {/* Add Orbit Controls */}
+      <OrbitControls/>
+
+
+  
+      <AxisHelper size={500} /> 
+
       <OriginalCube color="skyblue" />
-<ThickAxes length={10} radius={0.1} />
-     
+      <ThickAxes length={10} radius={0.1} />
+
       <FixedBoundingBox color="gray" />
       <CameraDebugger />
-      
+
 
 
 
@@ -376,8 +383,6 @@ function ThreeViewer() {
     </>
   );
   
- 
-
 }
 
 export default ThreeViewer;
