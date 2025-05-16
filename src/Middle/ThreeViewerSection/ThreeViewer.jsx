@@ -25,7 +25,8 @@ import ObjectManuplationGUI from './CustomGUI/ObjectManuplationGUI'
 //---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
 
 function BasePlateWithGridCombined({
-  color = '#000', // dark base plate
+  // color = '#000', // dark base plate
+  color = 'rgba(202, 202, 214, 0.8)',
   x_width = 20,
   y_width = 40,
   thickness = 1,
@@ -125,7 +126,7 @@ function BasePlateWithGridCombined({
         <meshStandardMaterial
           color={color}
           transparent
-          opacity={0.1}
+          opacity={0.25}
           polygonOffset
           polygonOffsetFactor={1}
           polygonOffsetUnits={1}

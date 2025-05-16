@@ -31,10 +31,10 @@ export default function ObjectManuplationGUI() {
           key={index}
           title={btn.label}
           style={{
-            background: 'transparent',
+            background: 'solid',
             border: 'none',
             cursor: 'pointer',
-            padding: '6px 10px',
+            padding: '5px 10px',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',

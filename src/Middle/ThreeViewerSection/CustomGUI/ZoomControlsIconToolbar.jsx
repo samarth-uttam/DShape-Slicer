@@ -1,8 +1,9 @@
 import 'remixicon/fonts/remixicon.css';
+import { Home, ZoomIn, ZoomOut } from 'lucide-react';
 
 export default function ZoomControlsIconToolbar() {
   const buttons = [
-    { iconClass: 'ri-box-3-fill'},
+    { iconClass: 'ri-home-fill'},
     { iconClass: 'ri-zoom-in-line'  },
     { iconClass: 'ri-zoom-out-line'  },
     
@@ -31,7 +32,7 @@ export default function ZoomControlsIconToolbar() {
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',
-            padding: '6px 10px',
+            padding: '5px 10px',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
