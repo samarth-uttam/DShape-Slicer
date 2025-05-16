@@ -26,7 +26,7 @@ import ObjectManuplationGUI from './CustomGUI/ObjectManuplationGUI'
 
 function BasePlateWithGridCombined({
   // color = '#000', // dark base plate
-  color = 'rgba(202, 202, 214, 0.8)',
+  color = 'rgba(202, 202, 214)',
   x_width = 20,
   y_width = 40,
   thickness = 1,

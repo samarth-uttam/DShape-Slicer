@@ -1,12 +1,22 @@
 import 'remixicon/fonts/remixicon.css';
-import { Home, ZoomIn, ZoomOut } from 'lucide-react';
 
 export default function ZoomControlsIconToolbar() {
   const buttons = [
-    { iconClass: 'ri-home-fill'},
-    { iconClass: 'ri-zoom-in-line'  },
-    { iconClass: 'ri-zoom-out-line'  },
-    
+    {
+      iconClass: 'ri-home-fill',
+      // label: 'Home View',
+      onClick: () => alert('Home View button clicked'),
+    },
+    {
+      iconClass: 'ri-zoom-in-line',
+      // label: 'Zoom In',
+      onClick: () => alert('Zoom In button clicked'),
+    },
+    {
+      iconClass: 'ri-zoom-out-line',
+      // label: 'Zoom Out',
+      onClick: () => alert('Zoom Out button clicked'),
+    },
   ];
 
   return (
@@ -18,7 +28,7 @@ export default function ZoomControlsIconToolbar() {
         display: 'flex',
         flexDirection: 'row',
         gap: '1px',
-        background: 'rgba(202, 202, 214, 0.8)',
+        backgroundColor: 'rgba(202, 202, 214, 0.8)', // fixed key name
         padding: '8px 12px',
         borderRadius: '10px',
         zIndex: 9999,
@@ -28,6 +38,7 @@ export default function ZoomControlsIconToolbar() {
         <button
           key={index}
           title={btn.label}
+          onClick={btn.onClick}
           style={{
             background: 'transparent',
             border: 'none',
@@ -39,7 +50,6 @@ export default function ZoomControlsIconToolbar() {
             fontSize: '14px',
             color: 'black',
           }}
-          onClick={() => alert(`${btn.label} clicked (no action yet)`)}
         >
           <i
             className={btn.iconClass}

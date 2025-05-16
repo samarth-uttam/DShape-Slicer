@@ -5,7 +5,7 @@ export default function ObjectManuplationGUI() {
     { iconClass: 'ri-box-2-line'},
     { iconClass: 'ri-dice-2-line'  },
     { iconClass: 'ri-sparkling-2-line'  },
-    // { iconClass: 'ri-drag-move-line'  },
+    { iconClass: 'ri-drag-move-line'  },
     { iconClass: 'ri-camera-fill'},
    
     
@@ -31,10 +31,10 @@ export default function ObjectManuplationGUI() {
           key={index}
           title={btn.label}
           style={{
-            background: 'solid',
+            background: 'transparent',
             border: 'none',
             cursor: 'pointer',
-            padding: '5px 10px',
+            padding: '6px 10px',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
