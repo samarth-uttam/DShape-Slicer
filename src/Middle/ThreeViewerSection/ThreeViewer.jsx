@@ -23,34 +23,10 @@ import ClickCheck from './scene/ClickCheck'
 //---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
 
 
-function BasePlate({ color = 'gray' }) {
-  const x_width = 20;        // Width along X (in meters)
-  const y_width = 20;        // Depth along Y
-  const thickness = 1;    // Thickness of the plate (1 cm)
-
-  return (
-    <mesh position={[x_width / 2, y_width / 2, (-thickness / 2) - 0.01]}>
-      <boxGeometry args={[x_width, y_width, thickness]} />
-      <meshStandardMaterial
-        color={color}
-        transparent
-        opacity={0.5}
-        polygonOffset={true}
-        polygonOffsetFactor={1}
-        polygonOffsetUnits={1}
-      />
-      <Edges scale={1} threshold={15} color="black" />
-    </mesh>
-  );
-}
-
-
-
-
 function BasePlateWithGridCombined({
-  color = 'gray',
+  color = '#000', // dark base plate
   x_width = 20,
-  y_width = 20,
+  y_width = 40,
   thickness = 1,
   gridSegments = 20
 }) {
@@ -59,7 +35,7 @@ function BasePlateWithGridCombined({
 
   const lines = [];
 
-  // Generate vertical lines
+  // Generate vertical grid lines
   for (let i = 0; i <= gridSegments; i++) {
     const x = i * stepX;
     lines.push(
@@ -75,12 +51,12 @@ function BasePlateWithGridCombined({
             itemSize={3}
           />
         </bufferGeometry>
-        <lineBasicMaterial color="black" />
+        <lineBasicMaterial color="#888" linewidth={1} />
       </line>
     );
   }
 
-  // Generate horizontal lines
+  // Generate horizontal grid lines
   for (let j = 0; j <= gridSegments; j++) {
     const y = j * stepY;
     lines.push(
@@ -96,35 +72,78 @@ function BasePlateWithGridCombined({
             itemSize={3}
           />
         </bufferGeometry>
-        <lineBasicMaterial color="black" />
+        <lineBasicMaterial color="#888" linewidth={1} />
       </line>
     );
   }
 
+  // Thicker center lines
+  const centerLines = [
+    <line key="center-v">
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={2}
+          array={new Float32Array([
+            x_width / 2, 0, 0,
+            x_width / 2, y_width, 0
+          ])}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <lineBasicMaterial color="black" linewidth={3} />
+    </line>,
+    <line key="center-h">
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={2}
+          array={new Float32Array([
+            0, y_width / 2, 0,
+            x_width, y_width / 2, 0
+          ])}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <lineBasicMaterial color="black" linewidth={3} />
+    </line>
+  ];
+
   return (
     <group>
-      {/* Base Plate shifted slightly below Z = 0 */}
+      {/* Base Plate */}
       <mesh position={[x_width / 2, y_width / 2, (-thickness / 2) - 0.01]}>
         <boxGeometry args={[x_width, y_width, thickness]} />
         <meshStandardMaterial
           color={color}
           transparent
-          opacity={0.5}
+          opacity={0.1}
           polygonOffset
           polygonOffsetFactor={1}
           polygonOffsetUnits={1}
         />
-        <Edges scale={1} threshold={15} color="black" />
+        <Edges scale={1} threshold={15} color="#DDE6ED" />
       </mesh>
 
-      {/* Grid lines at Z = 0 */}
+      {/* Grid */}
       <group position={[0, 0, 0]}>
         <mesh position={[x_width / 2, y_width / 2, 0]}>
           <planeGeometry args={[x_width, y_width]} />
           <meshBasicMaterial color={color} transparent opacity={0.05} />
         </mesh>
         {lines}
+        {centerLines}
       </group>
+
+      {/* Border-only Cube on top */}
+      <mesh position={[x_width / 2, y_width / 2, 5]}>
+        <boxGeometry args={[x_width, y_width, 10]} />
+        <meshBasicMaterial color="white" transparent opacity={0} />
+        <Edges scale={1} threshold={15} color="#DDE6ED" />
+       
+
+
+      </mesh>
     </group>
   );
 }
@@ -315,7 +334,7 @@ function SceneCanvas({ children , onPointerMissed}) {
     
       style={{ width: '100%', height: '100%' }}
       
-      camera={{ position: [43, 40, 34],
+      camera={{ position: [43, 48, 27],
         fov: 50,
         near: 0.1, 
         far: 1000 }}
@@ -446,54 +465,6 @@ function handlePointerMissedFactory(setSelected) {
 
 
 
-// function ThreeViewer() {
-
-
-//   return (
-//     <>
-//  <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} />
-
-
-// {/* <ModelTogglePanel
-//   models={models}
-//   toggleVisibility={toggleVisibility}
-//   selectModel={selectModel}
-// /> */}
-
-
-  
-
-
-// <SceneCanvas>
-//       <ambientLight intensity={0.5} />
-//        <CameraControls /> 
-//       <directionalLight position={[2, 2, 2]} />
-
-//       <AxisHelper size={500} /> {/* Global axis here */}
-//       {/* <CameraControls enableDamping={false} enablePan={true} /> */}
-//       <OriginalCube color="skyblue" />
-// <ThickAxes length={10} radius={0.1} />
-     
-//       <FixedBoundingBox color="gray" />
-//       <CameraDebugger />
-      
-
-
-
-//       {/* // debugging the functions values */}
-//     
-//       {/* <DebugCameraLive/> */}
-//       {/* <ClickCheck objects={objects} />*/}
-
-
-//     </SceneCanvas>
-
-//     </>
-//   );
-  
- 
-
-// }
 
 
 
@@ -512,48 +483,42 @@ function CameraDebugger() {
 
 
 
+
 function ThreeViewer() {
   return (
     <>
       <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} />
 
       <SceneCanvas>
-        {/* Global (unrotated) elements */}
-         <color attach="background" args={['#eeeeee']} />
-        <ambientLight intensity={0.5} />
-        <CameraControls />
-         <CameraDebugger /> 
-        {/* <CameraDebugger /> */}
-        {/* <SceneDebugger  /> */}
 
-        {/* 👇 Entire scene content rotated to Z-up */}
-<group rotation={[0, 0, 0]} position={[0, 0, 0]}>
+        
+          <color attach="background" args={['#eeeeee']} />
+          <ambientLight intensity={0.5} />
+          <CameraControls />
+     
 
           <SetZUpCamera />
           <directionalLight position={[2, 2, 2]} />
-          
-          {/* Your custom Z-up axes */}
-          {/* <ThickAxes length={100} radius={0.1} /> */}
-          <Stats />
-          <AxisHelper/>
-          {/* <XYGrid /> */}
-          {/* <BasePlate color="gray" /> */}
+          {/* <Stats /> */}
+          {/* <AxisHelper/> */}
+          <BasePlateWithGridCombined x_width={20} y_width={40} thickness={0.5} gridSegments={20} />
+          {/* <OutwardTriangle /> */}
+
+        
     
-          {/* <FlatGridPlate color="gray" x_width={20} y_width={20} gridSegments={20} /> */}
-          {/* <BasePlateWithGrid x_width={20} y_width={20} thickness={1} gridSegments={20} /> */}
-          <BasePlateWithGridCombined x_width={20} y_width={40} thickness={0.05} gridSegments={20} />
+
+        
           
 
   
 
-          {/* Scene objects */}
-          
-          <OriginalCube color="skyblue" />
-          {/* <FixedBoundingBox color="gray" /> */}
 
-          {/* Add other models inside this group */}
+          <OriginalCube color="skyblue" />
+
+          {/* <CameraDebugger />   */}
+
           {/* <ClickCheck objects={objects} /> */}
-        </group>
+
 
       </SceneCanvas>
     </>
