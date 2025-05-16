@@ -22,7 +22,6 @@ import ClickCheck from './scene/ClickCheck'
 
 //---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
 
-
 function BasePlateWithGridCombined({
   color = '#000', // dark base plate
   x_width = 20,
@@ -109,6 +108,13 @@ function BasePlateWithGridCombined({
     </line>
   ];
 
+  // Triangle shape for arrow
+  const triangleShape = new THREE.Shape();
+  triangleShape.moveTo(0, 0);
+  triangleShape.lineTo(1, 0.5);
+  triangleShape.lineTo(1, -0.5);
+  triangleShape.lineTo(0, 0);
+
   return (
     <group>
       {/* Base Plate */}
@@ -140,14 +146,19 @@ function BasePlateWithGridCombined({
         <boxGeometry args={[x_width, y_width, 10]} />
         <meshBasicMaterial color="white" transparent opacity={0} />
         <Edges scale={1} threshold={15} color="#DDE6ED" />
-       
+      </mesh>
 
-
+      {/* Triangle Arrow at Right Edge */}
+      <mesh
+        position={[x_width/ 2, y_width , 0.01]} // Shifted to the right edge
+        rotation={[0, 0, -Math.PI / 2]} // Flat and pointing in +X direction
+      >
+        <shapeGeometry args={[triangleShape]} />
+        <meshStandardMaterial color="#DDE6ED" />
       </mesh>
     </group>
   );
 }
-
 
 
 
