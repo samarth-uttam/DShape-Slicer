@@ -4,19 +4,16 @@
 console.clear()
 
 
-
-
 //importing standard libraries 
 
 import { Canvas, useThree ,useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useEffect, useRef, useState , useMemo } from 'react';
-import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF } from '@react-three/drei';
+import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF  } from '@react-three/drei';
 import { TransformControls } from '@react-three/drei';
 import { Eye, EyeOff } from 'lucide-react'
 import { Leva } from 'leva'
 import { Edges } from '@react-three/drei';
-
 
 
 
@@ -25,15 +22,114 @@ import ClickCheck from './scene/ClickCheck'
 
 //---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
 
-function FixedBoundingBox({ color = 'gray' }) {
+
+function BasePlate({ color = 'gray' }) {
+  const x_width = 20;        // Width along X (in meters)
+  const y_width = 20;        // Depth along Y
+  const thickness = 1;    // Thickness of the plate (1 cm)
+
   return (
-    <mesh position={[1, 2, 0.5]} /* center of 2x2x6 box */>
-      <boxGeometry args={[2, 4, 1]} />
-      <meshStandardMaterial color={color} transparent opacity={0.2} />
+    <mesh position={[x_width / 2, y_width / 2, (-thickness / 2) - 0.01]}>
+      <boxGeometry args={[x_width, y_width, thickness]} />
+      <meshStandardMaterial
+        color={color}
+        transparent
+        opacity={0.5}
+        polygonOffset={true}
+        polygonOffsetFactor={1}
+        polygonOffsetUnits={1}
+      />
       <Edges scale={1} threshold={15} color="black" />
     </mesh>
   );
 }
+
+
+
+
+function BasePlateWithGridCombined({
+  color = 'gray',
+  x_width = 20,
+  y_width = 20,
+  thickness = 1,
+  gridSegments = 20
+}) {
+  const stepX = x_width / gridSegments;
+  const stepY = y_width / gridSegments;
+
+  const lines = [];
+
+  // Generate vertical lines
+  for (let i = 0; i <= gridSegments; i++) {
+    const x = i * stepX;
+    lines.push(
+      <line key={`v-${i}`}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={2}
+            array={new Float32Array([
+              x, 0, 0,
+              x, y_width, 0
+            ])}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial color="black" />
+      </line>
+    );
+  }
+
+  // Generate horizontal lines
+  for (let j = 0; j <= gridSegments; j++) {
+    const y = j * stepY;
+    lines.push(
+      <line key={`h-${j}`}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={2}
+            array={new Float32Array([
+              0, y, 0,
+              x_width, y, 0
+            ])}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial color="black" />
+      </line>
+    );
+  }
+
+  return (
+    <group>
+      {/* Base Plate shifted slightly below Z = 0 */}
+      <mesh position={[x_width / 2, y_width / 2, (-thickness / 2) - 0.01]}>
+        <boxGeometry args={[x_width, y_width, thickness]} />
+        <meshStandardMaterial
+          color={color}
+          transparent
+          opacity={0.5}
+          polygonOffset
+          polygonOffsetFactor={1}
+          polygonOffsetUnits={1}
+        />
+        <Edges scale={1} threshold={15} color="black" />
+      </mesh>
+
+      {/* Grid lines at Z = 0 */}
+      <group position={[0, 0, 0]}>
+        <mesh position={[x_width / 2, y_width / 2, 0]}>
+          <planeGeometry args={[x_width, y_width]} />
+          <meshBasicMaterial color={color} transparent opacity={0.05} />
+        </mesh>
+        {lines}
+      </group>
+    </group>
+  );
+}
+
+
 
 
 function ThickAxes({ length = 5, radius = 0.05 }) {
@@ -118,6 +214,20 @@ function TorusKnot({ color = 'green', position , rotation}) {
 }
 
 
+// Setting the camera to Z-up
+
+function SetZUpCamera() {
+  const { camera } = useThree()
+
+  useEffect(() => {
+    camera.up.set(0, 0, 1)   // 👈 Z-up
+    camera.updateProjectionMatrix()
+  }, [camera])
+
+  return null
+}
+
+
 
 
 // AxesHelper Component
@@ -193,20 +303,7 @@ function ModelTogglePanel({ models, toggleVisibility, selectModel }) {
 }
 
 
-// Debugging the camera and controls
 
-function CameraDebugger() {
-  const { camera, controls } = useThree()
-
-  useFrame(() => {
-    console.log('Camera position:', camera.position)
-    if (controls) {
-      console.log('Controls target:', controls.target)
-    }
-  })
-
-  return null
-}
 
 
 // making the canvas 
@@ -217,7 +314,12 @@ function SceneCanvas({ children , onPointerMissed}) {
 
     
       style={{ width: '100%', height: '100%' }}
-      camera={{ position: [0, 15, 10], fov: 50, near: 0.1, far: 1000 }}
+      
+      camera={{ position: [43, 40, 34],
+        fov: 50,
+        near: 0.1, 
+        far: 1000 }}
+
 
       onPointerMissed={onPointerMissed}
       >
@@ -227,9 +329,8 @@ function SceneCanvas({ children , onPointerMissed}) {
   );
 }
 
-
 function CameraControls({
-  enableDamping = true,
+  enableDamping = false,
   dampingFactor = 0.1,
   enableZoom = true,
   enablePan = true,
@@ -239,42 +340,56 @@ function CameraControls({
   const controlsRef = useRef();
 
   useEffect(() => {
-    if (controlsRef.current) {
-      controlsRef.current.update();
-    }
-  }, []);
+    const controls = controlsRef.current;
+    if (!controls) return;
+
+    const handleKeyDown = (e) => {
+      const step = 0.5; // Smaller step = slower pan
+      switch (e.key) {
+        case 'ArrowUp':
+          controls.target.x -= step;
+          camera.position.x -= step;
+          break;
+        case 'ArrowDown':
+          controls.target.x += step;
+          camera.position.x += step;
+          break;
+        case 'ArrowLeft':
+          controls.target.y += step;
+          camera.position.y += step;
+          break;
+        case 'ArrowRight':
+          controls.target.y -= step;
+          camera.position.y -= step;
+          break;
+        default:
+          break;
+      }
+      controls.update();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [camera]);
 
   return (
     <OrbitControls
-      makeDefault // ✅ This line is critical!
-      ref={controlsRef}
-      args={[camera, gl.domElement]}
-      target={[0, 0, 0]}
-      enableDamping={enableDamping}
-      dampingFactor={dampingFactor}
-      enableZoom={enableZoom}
-      enablePan={enablePan}
-      enableRotate={enableRotate}
-      minPolarAngle={0}
-      maxPolarAngle={Math.PI}
-      minAzimuthAngle={-Infinity}
-      maxAzimuthAngle={Infinity}
-      screenSpacePanning={false}
-       zoomSpeed={0.5} 
-    />
+  makeDefault
+  ref={controlsRef}
+ target={[2, 12, -8]}
+  minPolarAngle={0}
+  maxPolarAngle={Math.PI / 2}
+  minAzimuthAngle={-Infinity}
+  maxAzimuthAngle={Infinity}
+  enablePan={true}
+  enableZoom={true}
+  enableRotate={true}
+  enableDamping={false}     // 🔧 disables smoothing
+  panSpeed={0.5}            // ✅ optional: control pan speed
+  zoomSpeed={0.2}           // ✅ optional: control zoom speed
+/>
   );
 }
-
-
-
-function LiveCameraLine() {
-  const { camera, controls } = useThree();
-
-  return (
-    <DebugLine from={[camera.position.x, camera.position.y, camera.position.z]} to={controls?.target?.toArray?.() || [0, 0, 0]} color="lime" />
-  );
-}
-
 
 
 // adding the grid to the scene 
@@ -289,8 +404,8 @@ function XYGrid() {
       cellColor="gray"
       sectionColor="black"
       fadeDistance={50}
-      fadeStrength={2}
-   rotation={[0, -Math.PI / 2, 0]}
+      fadeStrength={0}
+   rotation={[ -Math.PI / 2,0, 0]}
     />
   )
 }
@@ -331,53 +446,119 @@ function handlePointerMissedFactory(setSelected) {
 
 
 
-function ThreeViewer() {
+// function ThreeViewer() {
 
 
-  return (
-    <>
- <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} />
+//   return (
+//     <>
+//  <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} />
 
 
-{/* <ModelTogglePanel
-  models={models}
-  toggleVisibility={toggleVisibility}
-  selectModel={selectModel}
-/> */}
+// {/* <ModelTogglePanel
+//   models={models}
+//   toggleVisibility={toggleVisibility}
+//   selectModel={selectModel}
+// /> */}
 
 
   
 
 
-<SceneCanvas>
-      <ambientLight intensity={0.5} />
-       <CameraControls /> 
-      <directionalLight position={[2, 2, 2]} />
-      {/* <XYGrid /> */}
-      <AxisHelper size={500} /> {/* Global axis here */}
-      {/* <CameraControls enableDamping={false} enablePan={true} /> */}
-      <OriginalCube color="skyblue" />
-<ThickAxes length={10} radius={0.1} />
+// <SceneCanvas>
+//       <ambientLight intensity={0.5} />
+//        <CameraControls /> 
+//       <directionalLight position={[2, 2, 2]} />
+
+//       <AxisHelper size={500} /> {/* Global axis here */}
+//       {/* <CameraControls enableDamping={false} enablePan={true} /> */}
+//       <OriginalCube color="skyblue" />
+// <ThickAxes length={10} radius={0.1} />
      
-      <FixedBoundingBox color="gray" />
-      <CameraDebugger />
+//       <FixedBoundingBox color="gray" />
+//       <CameraDebugger />
       
 
 
 
-      {/* // debugging the functions values */}
-      {/* <Stats/> */}
-      {/* <DebugCameraLive/> */}
-      {/* <ClickCheck objects={objects} />*/}
+//       {/* // debugging the functions values */}
+//     
+//       {/* <DebugCameraLive/> */}
+//       {/* <ClickCheck objects={objects} />*/}
 
 
-    </SceneCanvas>
+//     </SceneCanvas>
 
-    </>
-  );
+//     </>
+//   );
   
  
 
+// }
+
+
+
+function CameraDebugger() {
+  const { camera, controls } = useThree();
+
+  useFrame(() => {
+    console.log('📸 Camera position:', camera.position.toArray());
+    if (controls) {
+      console.log('🎯 Controls target:', controls.target.toArray());
+    }
+  });
+
+  return null;
 }
+
+
+
+function ThreeViewer() {
+  return (
+    <>
+      <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} />
+
+      <SceneCanvas>
+        {/* Global (unrotated) elements */}
+         <color attach="background" args={['#eeeeee']} />
+        <ambientLight intensity={0.5} />
+        <CameraControls />
+         <CameraDebugger /> 
+        {/* <CameraDebugger /> */}
+        {/* <SceneDebugger  /> */}
+
+        {/* 👇 Entire scene content rotated to Z-up */}
+<group rotation={[0, 0, 0]} position={[0, 0, 0]}>
+
+          <SetZUpCamera />
+          <directionalLight position={[2, 2, 2]} />
+          
+          {/* Your custom Z-up axes */}
+          {/* <ThickAxes length={100} radius={0.1} /> */}
+          <Stats />
+          <AxisHelper/>
+          {/* <XYGrid /> */}
+          {/* <BasePlate color="gray" /> */}
+    
+          {/* <FlatGridPlate color="gray" x_width={20} y_width={20} gridSegments={20} /> */}
+          {/* <BasePlateWithGrid x_width={20} y_width={20} thickness={1} gridSegments={20} /> */}
+          <BasePlateWithGridCombined x_width={20} y_width={40} thickness={0.05} gridSegments={20} />
+          
+
+  
+
+          {/* Scene objects */}
+          
+          <OriginalCube color="skyblue" />
+          {/* <FixedBoundingBox color="gray" /> */}
+
+          {/* Add other models inside this group */}
+          {/* <ClickCheck objects={objects} /> */}
+        </group>
+
+      </SceneCanvas>
+    </>
+  );
+}
+
 
 export default ThreeViewer;
