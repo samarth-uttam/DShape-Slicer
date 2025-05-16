@@ -9,7 +9,7 @@ console.clear()
 import { Canvas, useThree ,useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useEffect, useRef, useState , useMemo } from 'react';
-import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF ,GizmoViewcube } from '@react-three/drei';
+import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF  } from '@react-three/drei';
 import { TransformControls } from '@react-three/drei';
 import { Eye, EyeOff } from 'lucide-react'
 import { Leva } from 'leva'
@@ -19,6 +19,8 @@ import { Edges } from '@react-three/drei';
 
 //importing different .jsx files from the same project 
 import ClickCheck from './scene/ClickCheck'
+import ZoomControlsIconToolbar from './CustomGUI/ZoomControlsIconToolbar'
+import ObjectManuplationGUI from './CustomGUI/ObjectManuplationGUI'
 
 //---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
 
@@ -529,9 +531,12 @@ function ThreeViewer() {
 
           <OriginalCube color="skyblue" />
           
-        <GizmoHelper alignment="bottom-left" margin={[75, 75]}>
-        <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" hideNegativeAxes={false} />
+        <GizmoHelper alignment="bottom-left" margin={[50, 50]}>
+        <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" hideNegativeAxes={true} />
         </GizmoHelper> 
+
+        
+
 
 
 
@@ -545,6 +550,9 @@ function ThreeViewer() {
 
 
       </SceneCanvas>
+      <ZoomControlsIconToolbar />
+      <ObjectManuplationGUI />
+
     </>
   );
 }
