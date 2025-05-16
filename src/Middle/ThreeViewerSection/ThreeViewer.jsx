@@ -9,12 +9,11 @@ console.clear()
 import { Canvas, useThree ,useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useEffect, useRef, useState , useMemo } from 'react';
-import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF } from '@react-three/drei';
+import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF  } from '@react-three/drei';
 import { TransformControls } from '@react-three/drei';
 import { Eye, EyeOff } from 'lucide-react'
 import { Leva } from 'leva'
 import { Edges } from '@react-three/drei';
-
 
 
 
@@ -518,45 +517,48 @@ function ThreeViewer() {
     <>
       <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} />
 
+      <SceneCanvas>
+        {/* Global (unrotated) elements */}
+         <color attach="background" args={['#eeeeee']} />
+        <ambientLight intensity={0.5} />
+        <CameraControls />
+         <CameraDebugger /> 
+        {/* <CameraDebugger /> */}
+        {/* <SceneDebugger  /> */}
 
-{/* <ModelTogglePanel
-  models={models}
-  toggleVisibility={toggleVisibility}
-  selectModel={selectModel}
-/> */}
+        {/* 👇 Entire scene content rotated to Z-up */}
+<group rotation={[0, 0, 0]} position={[0, 0, 0]}>
 
+          <SetZUpCamera />
+          <directionalLight position={[2, 2, 2]} />
+          
+          {/* Your custom Z-up axes */}
+          {/* <ThickAxes length={100} radius={0.1} /> */}
+          <Stats />
+          <AxisHelper/>
+          {/* <XYGrid /> */}
+          {/* <BasePlate color="gray" /> */}
+    
+          {/* <FlatGridPlate color="gray" x_width={20} y_width={20} gridSegments={20} /> */}
+          {/* <BasePlateWithGrid x_width={20} y_width={20} thickness={1} gridSegments={20} /> */}
+          <BasePlateWithGridCombined x_width={20} y_width={40} thickness={0.05} gridSegments={20} />
+          
 
   
 
+          {/* Scene objects */}
+          
+          <OriginalCube color="skyblue" />
+          {/* <FixedBoundingBox color="gray" /> */}
 
-<SceneCanvas>
-      <ambientLight intensity={0.5} />
-       <CameraControls /> 
-      <directionalLight position={[2, 2, 2]} />
-      {/* <XYGrid /> */}
-      <AxisHelper size={500} /> {/* Global axis here */}
-      {/* <CameraControls enableDamping={false} enablePan={true} /> */}
-      <OriginalCube color="skyblue" />
-<ThickAxes length={10} radius={0.1} />
-     
-      <FixedBoundingBox color="gray" />
-      <CameraDebugger />
-      
-
-
-
-      {/* // debugging the functions values */}
-      {/* <Stats/> */}
-      {/* <DebugCameraLive/> */}
-      {/* <ClickCheck objects={objects} />*/}
-
+          {/* Add other models inside this group */}
+          {/* <ClickCheck objects={objects} /> */}
+        </group>
 
       </SceneCanvas>
     </>
   );
-  
- 
-
 }
+
 
 export default ThreeViewer;
