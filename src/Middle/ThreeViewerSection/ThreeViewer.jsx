@@ -525,6 +525,10 @@ function ThreeViewer() {
 
 
           <OriginalCube color="skyblue" />
+            {/* Gizmo Axes Widget */}
+        <GizmoHelper alignment="bottom-left" margin={[80, 80]}>
+        <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" />
+      </GizmoHelper>
 
           {/* <CameraDebugger />   */}
 
