@@ -9,7 +9,7 @@ console.clear()
 import { Canvas, useThree ,useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useEffect, useRef, useState , useMemo } from 'react';
-import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF  } from '@react-three/drei';
+import { Stats, Grid, Center, GizmoHelper, GizmoViewport, AccumulativeShadows, RandomizedLight, OrbitControls, Environment, useGLTF ,GizmoViewcube } from '@react-three/drei';
 import { TransformControls } from '@react-three/drei';
 import { Eye, EyeOff } from 'lucide-react'
 import { Leva } from 'leva'
@@ -162,24 +162,24 @@ function BasePlateWithGridCombined({
 
 
 
-function ThickAxes({ length = 5, radius = 0.05 }) {
+function ThickAxes({ x_length = 5 , y_length  = 5 , z_length = 5, radius = 0.05 }) {
   return (
     <group>
       {/* X-axis: red */}
-      <mesh position={[length / 2, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[radius, radius, length, 16]} />
+      <mesh position={[x_length / 2, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[radius, radius, x_length, 16]} />
         <meshBasicMaterial color="red" />
       </mesh>
 
       {/* Y-axis: green */}
-      <mesh position={[0, length / 2, 0]}>
-        <cylinderGeometry args={[radius, radius, length, 16]} />
+      <mesh position={[0, y_length / 2, 0]}>
+        <cylinderGeometry args={[radius, radius, y_length, 16]} />
         <meshBasicMaterial color="green" />
       </mesh>
 
       {/* Z-axis: blue */}
-      <mesh position={[0, 0, length / 2]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[radius, radius, length, 16]} />
+      <mesh position={[0, 0, z_length / 2]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[radius, radius, z_length, 16]} />
         <meshBasicMaterial color="blue" />
       </mesh>
     </group>
@@ -422,6 +422,8 @@ function CameraControls({
 }
 
 
+
+
 // adding the grid to the scene 
 
 function XYGrid() {
@@ -513,7 +515,8 @@ function ThreeViewer() {
           {/* <Stats /> */}
           {/* <AxisHelper/> */}
           <BasePlateWithGridCombined x_width={20} y_width={40} thickness={0.5} gridSegments={20} />
-          {/* <OutwardTriangle /> */}
+    
+          <ThickAxes x_length={20} y_length={40} z_length={10} radius={0.02} />
 
         
     
@@ -525,10 +528,16 @@ function ThreeViewer() {
 
 
           <OriginalCube color="skyblue" />
-            {/* Gizmo Axes Widget */}
-        <GizmoHelper alignment="bottom-left" margin={[80, 80]}>
-        <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" />
-      </GizmoHelper>
+          
+        <GizmoHelper alignment="bottom-left" margin={[75, 75]}>
+        <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" hideNegativeAxes={false} />
+        </GizmoHelper> 
+
+
+
+
+
+
 
           {/* <CameraDebugger />   */}
 
