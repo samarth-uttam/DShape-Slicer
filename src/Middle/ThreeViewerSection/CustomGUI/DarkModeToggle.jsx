@@ -42,6 +42,7 @@ export default function DarkModeToggle({onToggleClick}) {
           justifyContent: isDark ? 'flex-end' : 'flex-start',
           padding: '3px',
           transition: 'all 0.3s ease-in-out',
+          outline: 'none', // 👈 Add this line
         }}
       >
         <div
