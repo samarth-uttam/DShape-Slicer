@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import 'remixicon/fonts/remixicon.css';
+import './DarkModeToggle.css';
+
+
 
 export default function DarkModeToggle({onToggleClick}) {
   const [isDark, setIsDark] = useState(false);
@@ -30,6 +33,8 @@ export default function DarkModeToggle({onToggleClick}) {
     >
       <button
         onClick={toggleTheme}
+         className="dark-toggle-btn"
+         title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         style={{
           width: '60px',
           height: '28px',

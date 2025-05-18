@@ -35,6 +35,7 @@ export default function ZoomControlsIconToolbar() {
         padding: '8px 12px',
         borderRadius: '10px',
         zIndex: 9999,
+        
       }}
     >
       {buttons.map((btn, index) => (
@@ -52,6 +53,7 @@ export default function ZoomControlsIconToolbar() {
             gap: '6px',
             fontSize: '14px',
             color: 'black',
+            outline: 'none', // 👈 Add this line
           }}
         >
           <i

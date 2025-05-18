@@ -1,0 +1,22 @@
+.dark-toggle-btn {
+    width: 60px;
+    height: 28px;
+    border-radius: 16px;
+    border: 1px solid #aaa;
+    background-color: #ddd;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 3px;
+    transition: all 0.3s ease-in-out;
+    outline: none;
+  }
+  
+  .dark-toggle-btn:hover {
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+    transform: scale(1.05);
+  }
+  
+
+  

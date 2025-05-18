@@ -40,6 +40,7 @@ export default function ObjectManuplationGUI() {
             gap: '6px',
             fontSize: '14px',
             color: 'black',
+            outline: 'none', // 👈 Add this line
           }}
           onClick={() => alert(`${btn.label} clicked (no action yet)`)}
         >
