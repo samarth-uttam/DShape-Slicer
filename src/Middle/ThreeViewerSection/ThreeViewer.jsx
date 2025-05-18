@@ -21,6 +21,7 @@ import { Edges } from '@react-three/drei';
 import ClickCheck from './scene/ClickCheck'
 import ZoomControlsIconToolbar from './CustomGUI/ZoomControlsIconToolbar'
 import ObjectManuplationGUI from './CustomGUI/ObjectManuplationGUI'
+import DarkModeToggle from './CustomGUI/DarkModeToggle'
 
 //---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
 
@@ -497,18 +498,38 @@ function CameraDebugger() {
   return null;
 }
 
+// At the top or in a separate utils.js file
+export function HandleDarkToggleClick(setSceneColor, isDarkMode) {
+  console.log('🔄 [handleDarkToggleClick] Now executing...');
+
+  if (isDarkMode) {
+    setSceneColor('#111111');  // Dark background
+  } else {
+    setSceneColor('#eeeeee');  // Light/default background
+  }
+
+  console.log(`✅ Scene color set to ${isDarkMode ? 'dark' : 'light'} mode`);
+}
 
 
 
 function ThreeViewer() {
+
+  const [sceneColor, setSceneColor] = useState('#eee'); // default light gray
+
+
+
+
+
   return (
     <>
-      <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} />
+      {/* <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} /> */}
 
       <SceneCanvas>
 
         
-          <color attach="background" args={['#eeeeee']} />
+      <color attach="background" args={[sceneColor]} />
+
           <ambientLight intensity={0.5} />
           <CameraControls />
      
@@ -551,7 +572,15 @@ function ThreeViewer() {
 
 
       </SceneCanvas>
-      <ZoomControlsIconToolbar />
+      <DarkModeToggle 
+  onToggleClick={(isDarkMode) => HandleDarkToggleClick(setSceneColor, isDarkMode)}
+/>
+
+
+      <ZoomControlsIconToolbar
+        
+      />
+
       <ObjectManuplationGUI />
 
     </>

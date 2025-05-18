@@ -5,13 +5,9 @@ export default function ZoomControlsIconToolbar() {
     {
       iconClass: 'ri-home-fill',
       // label: 'Home View',
-      onClick: () => {
-        if (!cameraRef || !controlsRef?.current) return;
-
-        cameraRef.position.copy(defaultPosition.current);
-        controlsRef.current.target.copy(defaultTarget.current);
-        controlsRef.current.update();
-      },
+      onClick: () => alert('Zoom In button clicked'),
+      
+      
     
     },
     {
