@@ -29,7 +29,7 @@ export default function Header() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
         <img src="/Dshape_1.webp" alt="Logo" style={{ height: '50px' }} />
         <nav style={{ display: 'flex', gap: '1.5rem' }}>
-          {["Get Started", "Documentation", "Dev Notes", "Support"].map((label) => (
+          {["Get Started", "Documentation", "Dev Notes", "Support" ].map((label) => (
             <a
               key={label}
               href="#"

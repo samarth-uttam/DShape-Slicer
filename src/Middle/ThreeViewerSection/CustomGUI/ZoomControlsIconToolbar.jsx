@@ -1,12 +1,16 @@
 import 'remixicon/fonts/remixicon.css';
 
-export default function ZoomControlsIconToolbar() {
+export default function ZoomControlsIconToolbar({onHomeClick}) {
   const buttons = [
     {
       iconClass: 'ri-home-fill',
       // label: 'Home View',
-      onClick: () => alert('Zoom In button clicked'),
+
       
+      onClick: () => {
+        console.log('🟢 Home button clicked');
+        if (onHomeClick) onHomeClick();  // call parent’s function
+      },
       
     
     },

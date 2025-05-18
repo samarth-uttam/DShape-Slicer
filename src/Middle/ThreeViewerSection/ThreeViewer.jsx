@@ -22,6 +22,8 @@ import ClickCheck from './scene/ClickCheck'
 import ZoomControlsIconToolbar from './CustomGUI/ZoomControlsIconToolbar'
 import ObjectManuplationGUI from './CustomGUI/ObjectManuplationGUI'
 import DarkModeToggle from './CustomGUI/DarkModeToggle'
+import * as initConfig from '../../config/InitConfig';
+
 
 //---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
 
@@ -349,10 +351,11 @@ function SceneCanvas({ children , onPointerMissed}) {
     
       style={{ width: '100%', height: '100%' }}
       
-      camera={{ position: [43, 48, 27],
-        fov: 50,
-        near: 0.1, 
-        far: 1000 }}
+      camera={{ 
+        position: initConfig.HOME_CAMERA_POSITION,
+        fov: initConfig.HOME_CAMERA_FOV,
+        near: initConfig.HOME_CAMERA_NEAR, 
+        far: initConfig.HOME_CAMERA_FAR }}
 
 
       onPointerMissed={onPointerMissed}
@@ -369,24 +372,33 @@ function CameraControls({
   enableZoom = true,
   enablePan = true,
   enableRotate = true,
+  cameraRef, // ✅ Receive this from parent
 }) {
   const { camera, gl } = useThree();
   const controlsRef = useRef();
 
+  // Pass the OrbitControls instance to the parent
+  useEffect(() => {
+    if (cameraRef) {
+      cameraRef.current = controlsRef.current;
+    }
+  }, [cameraRef]);
+
+  // Add keyboard pan behavior
   useEffect(() => {
     const controls = controlsRef.current;
     if (!controls) return;
 
     const handleKeyDown = (e) => {
-      const step = 0.5; // Smaller step = slower pan
+      const step = 0.5;
       switch (e.key) {
         case 'ArrowUp':
-          controls.target.x -= step;
-          camera.position.x -= step;
-          break;
-        case 'ArrowDown':
           controls.target.x += step;
           camera.position.x += step;
+          break;
+        case 'ArrowDown':
+          controls.target.x -= step;
+          camera.position.x -= step;
           break;
         case 'ArrowLeft':
           controls.target.y += step;
@@ -397,7 +409,7 @@ function CameraControls({
           camera.position.y -= step;
           break;
         default:
-          break;
+          return;
       }
       controls.update();
     };
@@ -408,20 +420,22 @@ function CameraControls({
 
   return (
     <OrbitControls
-  makeDefault
-  ref={controlsRef}
- target={[2, 12, -8]}
-  minPolarAngle={0}
-  maxPolarAngle={Math.PI / 2}
-  minAzimuthAngle={-Infinity}
-  maxAzimuthAngle={Infinity}
-  enablePan={true}
-  enableZoom={true}
-  enableRotate={true}
-  enableDamping={false}     // 🔧 disables smoothing
-  panSpeed={0.5}            // ✅ optional: control pan speed
-  zoomSpeed={0.2}           // ✅ optional: control zoom speed
-/>
+      makeDefault
+      ref={controlsRef}
+      args={[camera, gl.domElement]}
+      target={[2, 12, -8]}
+      minPolarAngle={0}
+      maxPolarAngle={Math.PI / 2}
+      minAzimuthAngle={-Infinity}
+      maxAzimuthAngle={Infinity}
+      enablePan={enablePan}
+      enableZoom={enableZoom}
+      enableRotate={enableRotate}
+      enableDamping={enableDamping}
+      dampingFactor={dampingFactor}
+      panSpeed={0.5}
+      zoomSpeed={0.2}
+    />
   );
 }
 
@@ -481,7 +495,19 @@ function handlePointerMissedFactory(setSelected) {
 
 
 
+// At the top of your file, after imports
+// import { useRef } from 'react';
 
+export const cameraRef = { current: null }; // ✅ not a hook, just a JS object
+
+export function handleHomeClick() {
+  console.log('🔁 Resetting camera...');
+  if (cameraRef.current) {
+    cameraRef.current.object.position.set(...initConfig.HOME_CAMERA_POSITION);
+    cameraRef.current.target.set(...initConfig.HOME_CAMERA_TARGET);
+    cameraRef.current.update();
+  }
+}
 
 
 
@@ -503,9 +529,9 @@ export function HandleDarkToggleClick(setSceneColor, isDarkMode) {
   console.log('🔄 [handleDarkToggleClick] Now executing...');
 
   if (isDarkMode) {
-    setSceneColor('#111111');  // Dark background
+    setSceneColor(initConfig.DARK_SCENE_COLOR);  // Dark background
   } else {
-    setSceneColor('#eeeeee');  // Light/default background
+    setSceneColor(initConfig.INITIAL_SCENE_COLOR);  // Light/default background
   }
 
   console.log(`✅ Scene color set to ${isDarkMode ? 'dark' : 'light'} mode`);
@@ -513,11 +539,24 @@ export function HandleDarkToggleClick(setSceneColor, isDarkMode) {
 
 
 
+
+
+
+
 function ThreeViewer() {
 
-  const [sceneColor, setSceneColor] = useState('#eee'); // default light gray
+  const [sceneColor, setSceneColor] = useState(initConfig.INITIAL_SCENE_COLOR); // default light gray
+//   const cameraRef = useRef(); // ref for camera controls
 
+// function handleHomeClick() {
+//   console.log('🔁 Resetting camera...');
 
+//   if (cameraRef.current) {
+//     cameraRef.current.object.position.set(43, 48, 27);
+//     cameraRef.current.target.set(2, 12, -8);
+//     cameraRef.current.update();
+//   }
+// }
 
 
 
@@ -531,7 +570,7 @@ function ThreeViewer() {
       <color attach="background" args={[sceneColor]} />
 
           <ambientLight intensity={0.5} />
-          <CameraControls />
+          <CameraControls cameraRef={cameraRef} /> {/* ✅ ref passed */}
      
 
           <SetZUpCamera />
@@ -577,9 +616,8 @@ function ThreeViewer() {
 />
 
 
-      <ZoomControlsIconToolbar
-        
-      />
+<ZoomControlsIconToolbar onHomeClick={handleHomeClick} /> {/* ✅ external fn used */}
+
 
       <ObjectManuplationGUI />
 
