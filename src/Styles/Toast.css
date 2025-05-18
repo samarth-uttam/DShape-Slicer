@@ -1,0 +1,30 @@
+src/styles/toast.css
+
+.toast-custom {
+    background: #d4d4d4 !important;     /* ✅ Only the toast box, not the page */
+    color: black !important;            /* ✅ Text color */
+    font-family: monospace;
+    border-radius: 8px !important;
+    padding: 1px 6px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    border-bottom: 4px solid #4a4a4a;
+  
+    /* Ensure no overall screen background/blur */
+    backdrop-filter: none !important;
+    background-clip: padding-box !important;
+  }
+  
+
+  /* src/styles/toast.css */
+/* src/styles/toast.css */
+
+.toast-no-bg {
+    background: transparent !important;
+    color: #000000 !important;           /* ✅ Pure black text */
+    font-family: monospace;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    font-size: 14px;
+  }
+  

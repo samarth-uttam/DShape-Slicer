@@ -1,6 +1,7 @@
 // src/App.jsx
 import './Styles/index.css';
 import './Styles/main.css';
+import './Styles/Toast.css'
 
 import HeaderSection from './Header/HeaderSection';
 import MiddleSection from './Middle/MiddleSection';

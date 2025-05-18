@@ -14,6 +14,7 @@ import { TransformControls } from '@react-three/drei';
 import { Eye, EyeOff } from 'lucide-react'
 import { Leva } from 'leva'
 import { Edges } from '@react-three/drei';
+import { toast, ToastContainer , Bounce } from 'react-toastify';
 
 
 
@@ -23,8 +24,11 @@ import ZoomControlsIconToolbar from './CustomGUI/ZoomControlsIconToolbar'
 import ObjectManuplationGUI from './CustomGUI/ObjectManuplationGUI'
 import DarkModeToggle from './CustomGUI/DarkModeToggle'
 import * as initConfig from '../../config/InitConfig';
-import { toast, ToastContainer } from 'react-toastify';
+
 import 'react-toastify/dist/ReactToastify.css';
+import { TOAST_OPTIONS } from '../../config/ToastConfig';
+import '../../styles/toast.css';
+
 
 
 //---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
@@ -610,11 +614,14 @@ function ThreeViewer() {
 />
 
 
-<ZoomControlsIconToolbar onHomeClick={handleHomeClick} /> {/* ✅ external fn used */}
+      <ZoomControlsIconToolbar onHomeClick={handleHomeClick} /> {/* ✅ external fn used */}
 
 
       <ObjectManuplationGUI />
-      <ToastContainer position="bottom-center" autoClose={2500} />
+
+
+      <ToastContainer {...TOAST_OPTIONS} />
+
 
 
     </>
