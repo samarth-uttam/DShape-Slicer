@@ -23,6 +23,8 @@ import ZoomControlsIconToolbar from './CustomGUI/ZoomControlsIconToolbar'
 import ObjectManuplationGUI from './CustomGUI/ObjectManuplationGUI'
 import DarkModeToggle from './CustomGUI/DarkModeToggle'
 import * as initConfig from '../../config/InitConfig';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 //---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
@@ -506,6 +508,8 @@ export function handleHomeClick() {
     cameraRef.current.object.position.set(...initConfig.HOME_CAMERA_POSITION);
     cameraRef.current.target.set(...initConfig.HOME_CAMERA_TARGET);
     cameraRef.current.update();
+    toast('Camera Reset!');
+    // setToast('🔁 Camera reset to home position'); // ✅ show message
   }
 }
 
@@ -535,6 +539,7 @@ export function HandleDarkToggleClick(setSceneColor, isDarkMode) {
   }
 
   console.log(`✅ Scene color set to ${isDarkMode ? 'dark' : 'light'} mode`);
+  
 }
 
 
@@ -546,17 +551,6 @@ export function HandleDarkToggleClick(setSceneColor, isDarkMode) {
 function ThreeViewer() {
 
   const [sceneColor, setSceneColor] = useState(initConfig.INITIAL_SCENE_COLOR); // default light gray
-//   const cameraRef = useRef(); // ref for camera controls
-
-// function handleHomeClick() {
-//   console.log('🔁 Resetting camera...');
-
-//   if (cameraRef.current) {
-//     cameraRef.current.object.position.set(43, 48, 27);
-//     cameraRef.current.target.set(2, 12, -8);
-//     cameraRef.current.update();
-//   }
-// }
 
 
 
@@ -620,6 +614,8 @@ function ThreeViewer() {
 
 
       <ObjectManuplationGUI />
+      <ToastContainer position="bottom-center" autoClose={2500} />
+
 
     </>
   );
