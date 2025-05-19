@@ -27,17 +27,26 @@ export default function Header() {
     <header className="top">
       {/* Left: Logo + Navigation */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-        <img src="/Dshape_1.webp" alt="Logo" style={{ height: '50px' }} />
+        <a href="/">
+  <img src="/Dshape_1.webp" alt="Logo" style={{ height: '50px', cursor: 'pointer' }} />
+</a>
         <nav style={{ display: 'flex', gap: '1.5rem' }}>
-          {["Get Started", "Documentation", "Dev Notes", "Support" ].map((label) => (
-            <a
-              key={label}
-              href="#"
-              className="nav-link"
-            >
-              {label}
-            </a>
-          ))}
+         {[
+  { label: "Get Started", url: "https://publish.obsidian.md/d-shape/D-Shape/About" },
+  
+  { label: "Dev Notes - Releases", url: "#" },
+  { label: "Support", url: "#" }
+].map(({ label, url }) => (
+  <a
+    key={label}
+    href={url}
+    target={url.startsWith('http') ? '_blank' : '_self'}
+    rel="noopener noreferrer"
+    className="nav-link"
+  >
+    {label}
+  </a>
+))}
         </nav>
       </div>
 

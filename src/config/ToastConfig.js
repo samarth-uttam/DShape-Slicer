@@ -13,5 +13,10 @@ export const TOAST_OPTIONS = {
   pauseOnHover: false,
   limit: 3,
   transition: Bounce,
-  className: 'toast-no-bg',  // Attach custom class
+
+  // ← this styles each toast “sticker”
+  className: 'toast-vision',
+
+  // ← this styles the outer “paper”
+  containerClassName: 'toast-container-transparent',
 };
