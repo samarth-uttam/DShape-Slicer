@@ -28,8 +28,20 @@ export default function Header() {
       {/* Left: Logo + Navigation */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
         <a href="/">
-  <img src="/Dshape_1.webp" alt="Logo" style={{ height: '50px', cursor: 'pointer' }} />
-</a>
+<img
+  src="/Dshape_1.webp"
+  alt="Logo"
+  style={{ height: '50px', cursor: 'pointer' }}
+  onClick={(e) => {
+    e.preventDefault(); // Just in case
+    const confirmed = window.confirm(
+      'Are you sure you want to go to the homepage? This will reset the scene and any changes will be lost.'
+    );
+    if (confirmed) {
+      window.location.href = '/'; // ✅ Reloads only if user clicks OK
+    }
+  }}
+/></a>
         <nav style={{ display: 'flex', gap: '1.5rem' }}>
          {[
   { label: "Get Started", url: "https://publish.obsidian.md/d-shape/D-Shape/About" },
