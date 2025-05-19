@@ -29,8 +29,8 @@ export default function Header() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
         <a href="/">
 <img
-  src="/Dshape_1.webp"
-  alt="Logo"
+  // src="/Dshape_1.webp" // 👈 Use the correct path for your logo
+  src={`${import.meta.env.BASE_URL}Dshape_1.webp`} alt="Logo"
   style={{ height: '50px', cursor: 'pointer' }}
   onClick={(e) => {
     e.preventDefault(); // Just in case
@@ -38,7 +38,8 @@ export default function Header() {
       'Are you sure you want to go to the homepage? This will reset the scene and any changes will be lost.'
     );
     if (confirmed) {
-      window.location.href = '/'; // ✅ Reloads only if user clicks OK
+        window.location.href = import.meta.env.BASE_URL;
+
     }
   }}
 /></a>

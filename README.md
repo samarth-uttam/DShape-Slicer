@@ -13,3 +13,13 @@ The website serves a couple of applications :
   All the copyrights and licesnes belong to DShape Limited based in Hong Kong. 
 
 For any queries, please contact **Samarth Uttam** at [samarth.uttamm@Dshape@com.hk](mailto:samarth.uttamm@Dshape@com.hk).
+
+
+[![Live Demo](https://img.shields.io/badge/Live-Demo-blue?style=for-the-badge)](https://samarth-uttam.github.io/DShape-Slicer/)
+
+
+
+### 🔗 Live Demo
+
+[Click here to see the live app](https://samarth-uttam.github.io/DShape-Slicer/)
+
