@@ -10,9 +10,8 @@ The website serves a couple of applications :
 
   The website is in development phase. 
   
-  All the copyrights and licesnes belong to DShape Limited based in Hong Kong. 
+  All the copyrights and licesnes belong to D-Shape Limited based in Hong Kong. 
 
-For any queries, please contact **Samarth Uttam** at [samarth.uttamm@Dshape@com.hk](mailto:samarth.uttamm@Dshape@com.hk).
 
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-blue?style=for-the-badge)](https://samarth-uttam.github.io/DShape-Slicer/)
