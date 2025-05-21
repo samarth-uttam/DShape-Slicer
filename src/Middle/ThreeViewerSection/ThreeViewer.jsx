@@ -14,7 +14,7 @@ import { TransformControls } from '@react-three/drei';
 import { Eye, EyeOff } from 'lucide-react'
 import { Leva } from 'leva'
 import { Edges } from '@react-three/drei';
-import { toast, ToastContainer , Bounce } from 'react-toastify';
+import { toast, ToastContainer , Bounce , Slide} from 'react-toastify';
 
 
 
@@ -26,11 +26,11 @@ import DarkModeToggle from './CustomGUI/DarkModeToggle'
 import * as initConfig from '../../config/InitConfig';
 
 import 'react-toastify/dist/ReactToastify.css';
-import { TOAST_OPTIONS } from '../../config/ToastConfig';
+import { TOAST_OPTIONS ,  showSuccessToast, showErrorToast} from '../../config/ToastConfig';
 import '../../styles/toast.css';
 
 
-
+const time = new Date().toLocaleTimeString();
 //---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
 
 function BasePlateWithGridCombined({
@@ -39,7 +39,8 @@ function BasePlateWithGridCombined({
   x_width = 20,
   y_width = 40,
   thickness = 1,
-  gridSegments = 20
+  gridSegments = 20,
+  box_height = 10
 }) {
   const stepX = x_width / gridSegments;
   const stepY = y_width / gridSegments;
@@ -154,8 +155,8 @@ function BasePlateWithGridCombined({
       </group>
 
       {/* Border-only Cube on top */}
-      <mesh position={[x_width / 2, y_width / 2, 5]}>
-        <boxGeometry args={[x_width, y_width, 10]} />
+      <mesh position={[x_width / 2, y_width / 2, box_height / 2]}>
+        <boxGeometry args={[x_width, y_width, box_height]} />
         <meshBasicMaterial color="white" transparent opacity={0} />
         <Edges scale={1} threshold={15} color="#DDE6ED" />
       </mesh>
@@ -512,8 +513,14 @@ export function handleHomeClick() {
     cameraRef.current.object.position.set(...initConfig.HOME_CAMERA_POSITION);
     cameraRef.current.target.set(...initConfig.HOME_CAMERA_TARGET);
     cameraRef.current.update();
-    toast('Camera Reset!');
-    // setToast('🔁 Camera reset to home position'); // ✅ show message
+  //  toast(
+  // <div>
+  //   📷 Camera Reset <br />
+  //   🏠 to Home Position
+  // </div>
+  // toast('The camera has been reset to the home position');
+  showSuccessToast('✅ File uploaded successfully!');
+
   }
 }
 
@@ -556,7 +563,14 @@ function ThreeViewer() {
 
   const [sceneColor, setSceneColor] = useState(initConfig.INITIAL_SCENE_COLOR); // default light gray
 
+        // useEffect(() => {
+        // const handleClick = (e) => {
+        // console.log(`🖱️ Click at X: ${e.clientX}px, Y: ${e.clientY}px`);
+        // };
 
+        // window.addEventListener('click', handleClick);
+        // return () => window.removeEventListener('click', handleClick);
+        // }, []);
 
   return (
     <>
@@ -575,7 +589,12 @@ function ThreeViewer() {
           <directionalLight position={[2, 2, 2]} />
           {/* <Stats /> */}
           {/* <AxisHelper/> */}
-          <BasePlateWithGridCombined x_width={20} y_width={40} thickness={0.5} gridSegments={20} />
+          <BasePlateWithGridCombined 
+                  x_width={initConfig.INITIAL_BUILD_PLATE_x}
+                  y_width={initConfig.INITIAL_BUILD_PLATE_y }
+                  thickness={0.5} 
+                  gridSegments={20} 
+                  box_height={initConfig.INITIAL_BUILD_PLATE_z} />
     
           <ThickAxes x_length={20} y_length={40} z_length={10} radius={0.02} />
 
@@ -621,6 +640,10 @@ function ThreeViewer() {
 
 
       <ToastContainer {...TOAST_OPTIONS} />
+          {/* <ToastContainer /> */}
+
+          {/* <ToastContainer {...TOAST_CONTAINER_OPTIONS} /> */}
+
 
 
 

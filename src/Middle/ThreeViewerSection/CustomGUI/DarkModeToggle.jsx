@@ -27,7 +27,7 @@ export default function DarkModeToggle({onToggleClick}) {
       style={{
         position: 'absolute',
         left: 20,
-        top: 125,
+        top: 175,
         zIndex: 9999,
       }}
     >
