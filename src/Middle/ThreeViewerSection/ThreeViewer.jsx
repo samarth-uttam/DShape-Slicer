@@ -519,7 +519,7 @@ export const cameraRef = { current: null }; // ✅ not a hook, just a JS object
 
 
 export function handleHomeClick(onFirstToast) {
-  console.log('🔁 Resetting camera...');
+
   if (cameraRef.current) {
     cameraRef.current.object.position.set(...initConfig.HOME_CAMERA_POSITION);
     cameraRef.current.target.set(...initConfig.HOME_CAMERA_TARGET);
@@ -529,20 +529,6 @@ export function handleHomeClick(onFirstToast) {
   }
 }
 
-
-
-function CameraDebugger() {
-  const { camera, controls } = useThree();
-
-  useFrame(() => {
-    console.log('📸 Camera position:', camera.position.toArray());
-    if (controls) {
-      console.log('🎯 Controls target:', controls.target.toArray());
-    }
-  });
-
-  return null;
-}
 
 
 
@@ -587,127 +573,90 @@ const WelcomeToast = React.forwardRef((_, ref) => (
 ));
 
 
+
+// This is the main threeviewer Function 
+
+
 function ThreeViewer() {
-  const [sceneColor, setSceneColor] = useState(initConfig.INITIAL_SCENE_COLOR);
-  const [showWelcome, setShowWelcome] = useState(true);
-  const welcomeRef = useRef();
-
-  const handleRealToast = () => setShowWelcome(false);
-
-  const removeWelcomeToast = () => {
-    if (welcomeRef.current) {
-      welcomeRef.current.remove();
-    }
-  };
 
 
-  return (
-    <>
+      const [sceneColor, setSceneColor] = useState(initConfig.INITIAL_SCENE_COLOR);
+      const [showWelcome, setShowWelcome] = useState(true);
+      const welcomeRef = useRef();
+      const handleRealToast = () => setShowWelcome(false);
+
+      const removeWelcomeToast = () => 
+        {
+          if (welcomeRef.current) {
+          welcomeRef.current.remove();
+          }
+        };
+
+
+    return (
+
+      <>
       {/* <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} /> */}
 
       <SceneCanvas>
-
-        
       <color attach="background" args={[sceneColor]} />
 
-          <ambientLight intensity={0.5} />
-          <CameraControls cameraRef={cameraRef} /> {/* ✅ ref passed */}
-     
-
-          <SetZUpCamera />
-          <directionalLight position={[2, 2, 2]} />
-          {/* <Stats /> */}
-          {/* <AxisHelper/> */}
-          <BasePlateWithGridCombined 
-                  x_width={initConfig.INITIAL_BUILD_PLATE_x}
-                  y_width={initConfig.INITIAL_BUILD_PLATE_y }
-                  thickness={0.5} 
-                  gridSegments={20} 
-                  box_height={initConfig.INITIAL_BUILD_PLATE_z} />
-    
-          <ThickAxes x_length={20} y_length={40} z_length={10} radius={0.02} />
-
-        
-    
-
-        
-          
-
-  
+      <ambientLight intensity={0.5} />
+      <CameraControls cameraRef={cameraRef} /> {/* ✅ ref passed */}
 
 
-          <OriginalCube color="skyblue" />
-          
-        <GizmoHelper alignment="bottom-left" margin={[50, 50]}>
-        <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" hideNegativeAxes={true} />
-        </GizmoHelper> 
+      <SetZUpCamera />
+      <directionalLight position={[2, 2, 2]} />
+      <BasePlateWithGridCombined 
+          x_width={initConfig.INITIAL_BUILD_PLATE_x}
+          y_width={initConfig.INITIAL_BUILD_PLATE_y }
+          thickness={0.5} 
+          gridSegments={20} 
+          box_height={initConfig.INITIAL_BUILD_PLATE_z} />
 
-        
-
-
-
-
-
+      <ThickAxes x_length={20} y_length={40} z_length={10} radius={0.02} />
 
 
+      <OriginalCube color="skyblue" />
 
-          {/* <CameraDebugger />   */}
-
-          {/* <ClickCheck objects={objects} /> */}
+      <GizmoHelper alignment="bottom-left" margin={[50, 50]}>
+      <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" hideNegativeAxes={true} />
+      </GizmoHelper> 
 
 
       </SceneCanvas>
 
+      {/* This is the dark mode toggle. it takes the dark mode status from the parent file */}
 
-<DarkModeToggle 
-  onToggleClick={(isDarkMode) => HandleDarkToggleClick(setSceneColor, isDarkMode, () => {
-    if (welcomeRef.current) {
-      welcomeRef.current.remove();
-    }
-  })}
- />
+      <DarkModeToggle 
+      onToggleClick=
+      
+      {(isDarkMode) => HandleDarkToggleClick( 
+        setSceneColor, 
+        isDarkMode, 
+        () => {
+                if (welcomeRef.current)
+               {
+                welcomeRef.current.remove();
+                }
+              })
+      }
+      />
 
 
 
-<ZoomControlsIconToolbar onHomeClick={() => handleHomeClick(removeWelcomeToast)} />
-
-
+      <ZoomControlsIconToolbar onHomeClick={() => handleHomeClick(removeWelcomeToast)} />
       <ObjectManuplationGUI />
 
 
-      {/* {showWelcome && (
-  <div
-  ref={welcomeRef}
-
-    style={{
-      position: 'fixed',
-      top: 100,
-      left: 20,
-      backgroundColor: TOAST_COLORS.background,
-      color: TOAST_COLORS.text.success,
-      fontFamily: "'Montserrat', sans-serif",
-      fontSize: '15px',
-      padding: '2px 8px',
-      borderTopLeftRadius: '0px',
-      borderTopRightRadius: '50px',
-      borderBottomRightRadius: '50px',
-      borderBottomLeftRadius: '0px',
-      boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.01)',
-      zIndex: 9999,
-    }}
-  >
-    👋 Welcome!
-  </div>
-)} */}
-      
       {showWelcome && <WelcomeToast ref={welcomeRef} />}
 
       {/* <ToastContainer {...TOAST_OPTIONS} /> */}
       <ToastContainer {...TOAST_OPTIONS} style={TOAST_CONTAINER_STYLE} />
 
-    </>
-  );
-}
+      </>
+      );
+      }
 
 
 export default ThreeViewer;

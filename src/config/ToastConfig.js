@@ -27,7 +27,7 @@ const getCurrentTime = () => {
 
 
 
-// new toast options trying because the old ones are not working
+// the toast behavour is defined here 
 
 export const BASE_OPTIONS = {
   position: "top-left",
@@ -45,74 +45,11 @@ export const BASE_OPTIONS = {
 
 
 
-// different toast options for different types of messages
-
-
-// export const showSuccessToast = (message) =>
-//   toast(`${getCurrentTime()} - ${message}`, {
-//     ...BASE_OPTIONS,
-//     className: 'toast-success', // Custom class for success
-//   });
-
-
-// export const showToast = (message) =>
-//   toast(` ${message}`, 
-    
-    
-//     {
-    
-//     ...BASE_OPTIONS,
-
-//     style: 
-    
-//     {
-//       fontSize: '15px', // Smaller font
-//       lineHeight: '1',  // Tighter line height
-//       padding: '2px 8px', // Less vertical and horizontal padding
-//       minHeight: 'auto', // Prevents default min-height from stretching the toast
-
-//       backgroundColor: TOAST_COLORS.background,
-//       color: TOAST_COLORS.text.success,
-
-//       borderTopLeftRadius: '0px',
-//       borderTopRightRadius: '50px',
-//       borderBottomRightRadius: '50px',
-//       borderBottomLeftRadius: '0px',
-
-//       boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.01)', // X-offset, Y-offset, blur, transparency
-
-
-//     },
-//   });
-
-
-
-// export const showToast = (message) => {
-//   toast.dismiss(); // 👈 dismiss any existing toast immediately
-
-//   toast(` ${message}`, {
-//     ...BASE_OPTIONS,
-
-//     style: {
-//       fontSize: '15px',
-//       lineHeight: '1',
-//       padding: '2px 8px',
-//       minHeight: 'auto',
-//       backgroundColor: TOAST_COLORS.background,
-//       color: TOAST_COLORS.text.success,
-//       borderTopLeftRadius: '0px',
-//       borderTopRightRadius: '50px',
-//       borderBottomRightRadius: '50px',
-//       borderBottomLeftRadius: '0px',
-//       boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.01)',
-//     },
-//   });
-// };
 
 
 
 // globally scoped ID
-const TOAST_ID = 'singleton';
+const TOAST_ID = 'some_random_ID_for_Toast';
 
 export const showToast = (message, onFirstToast = () => {}) => {
   // Call the passed-in callback (used to remove fake toast)
