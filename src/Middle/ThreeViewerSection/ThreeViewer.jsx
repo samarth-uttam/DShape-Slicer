@@ -25,9 +25,14 @@ import ObjectManuplationGUI from './CustomGUI/ObjectManuplationGUI'
 import DarkModeToggle from './CustomGUI/DarkModeToggle'
 import * as initConfig from '../../config/InitConfig';
 
+
 import 'react-toastify/dist/ReactToastify.css';
-import { TOAST_OPTIONS ,  showSuccessToast, showErrorToast} from '../../config/ToastConfig';
 import '../../styles/toast.css';
+
+
+// ✅ This is correct
+import { TOAST_CONTAINER_STYLE } from '../../config/InitConfig';
+import { TOAST_OPTIONS , showToast } from '../../config/ToastConfig';
 
 
 const time = new Date().toLocaleTimeString();
@@ -519,7 +524,7 @@ export function handleHomeClick() {
   //   🏠 to Home Position
   // </div>
   // toast('The camera has been reset to the home position');
-  showSuccessToast('✅ File uploaded successfully!');
+  showToast(' File uploaded successfully!');
 
   }
 }
@@ -550,6 +555,8 @@ export function HandleDarkToggleClick(setSceneColor, isDarkMode) {
   }
 
   console.log(`✅ Scene color set to ${isDarkMode ? 'dark' : 'light'} mode`);
+  showToast(` Scene color set to ${isDarkMode ? 'dark' : 'light'} mode`);
+
   
 }
 
@@ -639,13 +646,10 @@ function ThreeViewer() {
       <ObjectManuplationGUI />
 
 
-      <ToastContainer {...TOAST_OPTIONS} />
-          {/* <ToastContainer /> */}
 
-          {/* <ToastContainer {...TOAST_CONTAINER_OPTIONS} /> */}
-
-
-
+      
+      {/* <ToastContainer {...TOAST_OPTIONS} /> */}
+      <ToastContainer {...TOAST_OPTIONS} style={TOAST_CONTAINER_STYLE} />
 
     </>
   );

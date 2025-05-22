@@ -1,5 +1,7 @@
 // src/config/InitConfig.js
 
+import { color } from "three/tsl";
+
 
 // scene color details 
 
@@ -23,4 +25,64 @@ export const HOME_CAMERA_FAR = 1000;
 const INITIAL_BUILD_PLATE_x  = 20
 const INITIAL_BUILD_PLATE_y  = 40
 const INITIAL_BUILD_PLATE_z  =10 
+
+
+
+// TOAST COLORS 
+
+export const TOAST_COLORS = {
+  background: 'rgba(177, 170, 170, 0)',      // already in rgba
+  success: 'rgba(193, 255, 38, 1)',
+  error: 'rgba(234, 67, 53, 1)',
+  info: 'rgba(66, 133, 244, 1)',
+  text: {
+    success: 'rgb(81, 76, 76)',
+    error: 'rgba(10, 10, 10, 1)',
+    info: 'rgba(10, 10, 10, 1)',
+  },
+};
+
+
+
+// export const TOAST_STYLE = {
+//   top: '105px',
+//   left: '15px',
+//   fontSize: '13px',
+//   padding: '70px 6px',           // ✅ Minimal internal space
+//   lineHeight: '1',              // ✅ Compact line spacing
+//   minHeight: 'unset',           // ✅ Let content define height
+//   borderRadius: '4px 10px 10px 4px',
+//   width: 'fit-content',
+//   maxWidth: '80vw',
+//   minWidth: '100px',
+//   wordWrap: 'break-word',
+//   display: 'inline-block',
+//   margin: '0',                  // ✅ Ensure no outer margin
+// };
+
+
+export const TOAST_STYLE = {
+  // fontSize: '5px',
+ 
+  minHeight: 'unset',
+
+  width: 'fit-content',
+  maxWidth: '80vw',
+  minWidth: '100px',
+  
+  wordWrap: 'break-word',
+  display: 'inline-block',
+  
+  color : 'red'
+};
+
+
+export const TOAST_CONTAINER_STYLE = {
+  top: '125px',
+  left: '15px',
+  right: 'auto',
+  bottom: 'auto',
+  position: 'fixed',
+  zIndex: 9999,
+};
 

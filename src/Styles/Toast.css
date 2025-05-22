@@ -1,14 +1,3 @@
-/* .custom-toast-container {
-  top: 105px !important;
-  left: 15px !important;
-  right: auto !important;
-  bottom: auto !important;
-  position: fixed !important;
-  width: fit-content !important;
-  
-
-}
- */
 
 .fadeIn {
   opacity: 0;
@@ -32,49 +21,13 @@
   }
 }
 
-:root {
-  /* --toastify-text-color-light: rgb(33, 212, 122) !important; */
-
-  /* --toastify-toast-background: rgba(255, 255, 255, 0.0); 0.0 → fully transparent */
-
-}
 
 
 
-
-
-/* Container */
-.custom-toast-container {
-  top: 105px !important;
-  left: 15px !important;
-  position: fixed !important;
-}
-
-/* Toast box base (optional) */
-.Toastify__toast {
-  font-family: 'Inter', sans-serif;
-  border-radius: 8px;
-  padding: 10px 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Success */
-.toast-success {
-  background-color: #ff0000 !important;
-  color: #bc16b7 !important;
-  border-left: 4px solid #c1ff26 !important;
-}
-
-/* Error */
-.toast-error {
-  background-color: #fce8e6;
-  color: #d93025;
-  border-left: 4px solid #ea4335;
-}
-
-/* Info (optional) */
-.toast-info {
-  background-color: #e8f0fe;
-  color: #1967d2;
-  border-left: 4px solid #4285f4;
-}
+/* Toast box base (optional)  - this is because due to some behaviour clash between container and the toast */
+ .Toastify__toast {       
+        width: fit-content !important; 
+        /* font-size: 5px;         */
+     
+      }
+      
