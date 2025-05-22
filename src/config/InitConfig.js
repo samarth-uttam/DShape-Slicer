@@ -44,21 +44,6 @@ export const TOAST_COLORS = {
 
 
 
-// export const TOAST_STYLE = {
-//   top: '105px',
-//   left: '15px',
-//   fontSize: '13px',
-//   padding: '70px 6px',           // ✅ Minimal internal space
-//   lineHeight: '1',              // ✅ Compact line spacing
-//   minHeight: 'unset',           // ✅ Let content define height
-//   borderRadius: '4px 10px 10px 4px',
-//   width: 'fit-content',
-//   maxWidth: '80vw',
-//   minWidth: '100px',
-//   wordWrap: 'break-word',
-//   display: 'inline-block',
-//   margin: '0',                  // ✅ Ensure no outer margin
-// };
 
 
 export const TOAST_STYLE = {

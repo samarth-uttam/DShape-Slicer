@@ -26,8 +26,8 @@ export default function DarkModeToggle({onToggleClick}) {
     <div
       style={{
         position: 'absolute',
-        left: 20,
-        top: 175,
+        left: 25,
+        top: 150,
         zIndex: 9999,
       }}
     >

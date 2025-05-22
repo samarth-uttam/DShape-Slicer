@@ -15,6 +15,8 @@ import { Eye, EyeOff } from 'lucide-react'
 import { Leva } from 'leva'
 import { Edges } from '@react-three/drei';
 import { toast, ToastContainer , Bounce , Slide} from 'react-toastify';
+import React from 'react';
+
 
 
 
@@ -32,7 +34,9 @@ import '../../styles/toast.css';
 
 // ✅ This is correct
 import { TOAST_CONTAINER_STYLE } from '../../config/InitConfig';
-import { TOAST_OPTIONS , showToast } from '../../config/ToastConfig';
+import { TOAST_OPTIONS , showToast , BASE_OPTIONS , } from '../../config/ToastConfig';
+import { TOAST_COLORS } from '../../config/InitConfig';
+
 
 
 const time = new Date().toLocaleTimeString();
@@ -512,20 +516,16 @@ function handlePointerMissedFactory(setSelected) {
 
 export const cameraRef = { current: null }; // ✅ not a hook, just a JS object
 
-export function handleHomeClick() {
+
+
+export function handleHomeClick(onFirstToast) {
   console.log('🔁 Resetting camera...');
   if (cameraRef.current) {
     cameraRef.current.object.position.set(...initConfig.HOME_CAMERA_POSITION);
     cameraRef.current.target.set(...initConfig.HOME_CAMERA_TARGET);
     cameraRef.current.update();
-  //  toast(
-  // <div>
-  //   📷 Camera Reset <br />
-  //   🏠 to Home Position
-  // </div>
-  // toast('The camera has been reset to the home position');
-  showToast(' File uploaded successfully!');
 
+    showToast('Home Position Set Successfully!', onFirstToast);
   }
 }
 
@@ -544,8 +544,10 @@ function CameraDebugger() {
   return null;
 }
 
+
+
 // At the top or in a separate utils.js file
-export function HandleDarkToggleClick(setSceneColor, isDarkMode) {
+export function HandleDarkToggleClick(setSceneColor, isDarkMode, onFirstToast = () => {}) {
   console.log('🔄 [handleDarkToggleClick] Now executing...');
 
   if (isDarkMode) {
@@ -555,29 +557,49 @@ export function HandleDarkToggleClick(setSceneColor, isDarkMode) {
   }
 
   console.log(`✅ Scene color set to ${isDarkMode ? 'dark' : 'light'} mode`);
-  showToast(` Scene color set to ${isDarkMode ? 'dark' : 'light'} mode`);
-
-  
+  showToast(`Scene color set to ${isDarkMode ? 'dark' : 'light'} mode`, onFirstToast);
 }
 
 
 
-
-
+const WelcomeToast = React.forwardRef((_, ref) => (
+  <div
+    ref={ref}
+    style={{
+      position: 'fixed',
+      top: 115,
+      left: 15,
+      backgroundColor: TOAST_COLORS.background,
+      color: TOAST_COLORS.text.success,
+      fontFamily: "'Montserrat', sans-serif",
+      fontSize: '15px',
+      padding: '2px 8px',
+      borderTopLeftRadius: '0px',
+      borderTopRightRadius: '50px',
+      borderBottomRightRadius: '50px',
+      borderBottomLeftRadius: '0px',
+      boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.01)',
+      zIndex: 9999,
+    }}
+  >
+   ⚙️ Welcome to D-Shape Slicer. Please add an object to get started. For Tutorial Click on 'Get Started' above.
+  </div>
+));
 
 
 function ThreeViewer() {
+  const [sceneColor, setSceneColor] = useState(initConfig.INITIAL_SCENE_COLOR);
+  const [showWelcome, setShowWelcome] = useState(true);
+  const welcomeRef = useRef();
 
-  const [sceneColor, setSceneColor] = useState(initConfig.INITIAL_SCENE_COLOR); // default light gray
+  const handleRealToast = () => setShowWelcome(false);
 
-        // useEffect(() => {
-        // const handleClick = (e) => {
-        // console.log(`🖱️ Click at X: ${e.clientX}px, Y: ${e.clientY}px`);
-        // };
+  const removeWelcomeToast = () => {
+    if (welcomeRef.current) {
+      welcomeRef.current.remove();
+    }
+  };
 
-        // window.addEventListener('click', handleClick);
-        // return () => window.removeEventListener('click', handleClick);
-        // }, []);
 
   return (
     <>
@@ -635,19 +657,51 @@ function ThreeViewer() {
 
 
       </SceneCanvas>
-      <DarkModeToggle 
-  onToggleClick={(isDarkMode) => HandleDarkToggleClick(setSceneColor, isDarkMode)}
-/>
 
 
-      <ZoomControlsIconToolbar onHomeClick={handleHomeClick} /> {/* ✅ external fn used */}
+<DarkModeToggle 
+  onToggleClick={(isDarkMode) => HandleDarkToggleClick(setSceneColor, isDarkMode, () => {
+    if (welcomeRef.current) {
+      welcomeRef.current.remove();
+    }
+  })}
+ />
+
+
+
+<ZoomControlsIconToolbar onHomeClick={() => handleHomeClick(removeWelcomeToast)} />
 
 
       <ObjectManuplationGUI />
 
 
+      {/* {showWelcome && (
+  <div
+  ref={welcomeRef}
 
+    style={{
+      position: 'fixed',
+      top: 100,
+      left: 20,
+      backgroundColor: TOAST_COLORS.background,
+      color: TOAST_COLORS.text.success,
+      fontFamily: "'Montserrat', sans-serif",
+      fontSize: '15px',
+      padding: '2px 8px',
+      borderTopLeftRadius: '0px',
+      borderTopRightRadius: '50px',
+      borderBottomRightRadius: '50px',
+      borderBottomLeftRadius: '0px',
+      boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.01)',
+      zIndex: 9999,
+    }}
+  >
+    👋 Welcome!
+  </div>
+)} */}
       
+      {showWelcome && <WelcomeToast ref={welcomeRef} />}
+
       {/* <ToastContainer {...TOAST_OPTIONS} /> */}
       <ToastContainer {...TOAST_OPTIONS} style={TOAST_CONTAINER_STYLE} />
 

@@ -29,7 +29,7 @@ const getCurrentTime = () => {
 
 // new toast options trying because the old ones are not working
 
-const BASE_OPTIONS = {
+export const BASE_OPTIONS = {
   position: "top-left",
     autoClose: 1500,
     hideProgressBar: true,
@@ -114,12 +114,15 @@ const BASE_OPTIONS = {
 // globally scoped ID
 const TOAST_ID = 'singleton';
 
-export const showToast = (message) => {
-  // If the toast already exists, just update it
+export const showToast = (message, onFirstToast = () => {}) => {
+  // Call the passed-in callback (used to remove fake toast)
+  onFirstToast();
+
   if (toast.isActive(TOAST_ID)) {
     toast.update(TOAST_ID, {
       render: message,
       autoClose: 1500,
+      
     });
   } else {
     toast(message, {
