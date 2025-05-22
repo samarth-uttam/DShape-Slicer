@@ -646,6 +646,9 @@ function ThreeViewer() {
 
 
       <ZoomControlsIconToolbar onHomeClick={() => handleHomeClick(removeWelcomeToast)} />
+
+
+        
       <ObjectManuplationGUI />
 
 
