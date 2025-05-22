@@ -78,7 +78,7 @@ export const TOAST_STYLE = {
 
 
 export const TOAST_CONTAINER_STYLE = {
-  top: '125px',
+  top: '115px',
   left: '15px',
   right: 'auto',
   bottom: 'auto',

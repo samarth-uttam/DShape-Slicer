@@ -133,6 +133,8 @@ export const showToast = (message) => {
       transition: Fade,
       closeButton: false,
       style: {
+        fontFamily: "'Montserrat', sans-serif", // 👈 Add this line
+
         fontSize: '15px',
         lineHeight: '1',
         padding: '2px 8px',
