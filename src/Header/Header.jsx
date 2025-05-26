@@ -6,6 +6,7 @@ export default function Header() {
   const [activeMenu, setActiveMenu] = useState(null);
   const userRef = useRef();
   const printerRef = useRef();
+  // Close the menu when clicking outside of it
 
   useEffect(() => {
     function handleClickOutside(e) {
