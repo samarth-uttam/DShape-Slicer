@@ -654,6 +654,7 @@ export default function TransformObjectGUI({ selectedIds, objectTransforms, setO
               </>
             )}
 
+
             {/* Reset Button */}
             <div style={{ marginTop: '8px' }}>
               <button
