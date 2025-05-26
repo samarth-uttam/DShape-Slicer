@@ -20,20 +20,10 @@ export default function TransformObjectGUI() {
     setActiveTool((prev) => (prev === tool ? null : tool));
   };
 
-  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-
   const updateValue = (tool, axis, delta) => {
     setDummyValues((prev) => {
       const updated = { ...prev[tool] };
-      let newValue = updated[axis] + delta;
-
-      if (tool === 'rotate') {
-        newValue = clamp(newValue, -180, 180);
-      } else if (tool === 'scale') {
-        newValue = clamp(newValue, -5, 5);
-      }
-
-      newValue = parseFloat(newValue.toFixed(2));
+      const newValue = parseFloat((updated[axis] + delta).toFixed(2));
 
       if (tool === 'scale' && scaleLocked) {
         return {
@@ -57,6 +47,15 @@ export default function TransformObjectGUI() {
       ...prev,
       scale: { x: smallest, y: smallest, z: smallest },
     }));
+  };
+
+  const resetValues = (tool) => {
+    const defaults = {
+      translate: { x: 0, y: 0, z: 0 },
+      rotate: { x: 0, y: 0, z: 0 },
+      scale: { x: 1, y: 1, z: 1 },
+    };
+    setDummyValues((prev) => ({ ...prev, [tool]: defaults[tool] }));
   };
 
   const axisColors = {
@@ -101,7 +100,7 @@ export default function TransformObjectGUI() {
 
   return (
     <>
-      {/* Toolbar */}
+      {/* Bottom Toolbar */}
       <div
         style={{
           position: 'absolute',
@@ -193,24 +192,12 @@ export default function TransformObjectGUI() {
                   <span style={{ width: '12px', fontWeight: 600, color: axisColors[axis] }}>{axis}</span>
                   <input
                     type="text"
-                    value={`${dummyValues[activeTool][axis].toFixed(2)} ${
-                      activeTool === 'rotate' ? '°' : 'cm'
-                    }`}
+                    value={`${dummyValues[activeTool][axis].toFixed(2)} ${activeTool === 'rotate' ? '°' : 'cm'}`}
                     readOnly
                     style={valueInputStyle}
                   />
-                  <button
-                    style={stepperBtn}
-                    onClick={() => updateValue(activeTool, axis, activeTool === 'rotate' ? -30 : -1)}
-                  >
-                    −
-                  </button>
-                  <button
-                    style={stepperBtn}
-                    onClick={() => updateValue(activeTool, axis, activeTool === 'rotate' ? 30 : 1)}
-                  >
-                    +
-                  </button>
+                  <button style={stepperBtn} onClick={() => updateValue(activeTool, axis, activeTool === 'rotate' ? -30 : -1)}>−</button>
+                  <button style={stepperBtn} onClick={() => updateValue(activeTool, axis, activeTool === 'rotate' ? 30 : 1)}>+</button>
                 </div>
               ))}
 
@@ -260,16 +247,32 @@ export default function TransformObjectGUI() {
                       readOnly
                       style={valueInputStyle}
                     />
-                    <button style={stepperBtn} onClick={() => updateValue('scale', axis, -0.1)}>
-                      −
-                    </button>
-                    <button style={stepperBtn} onClick={() => updateValue('scale', axis, 0.1)}>
-                      +
-                    </button>
+                    <button style={stepperBtn} onClick={() => updateValue('scale', axis, -0.1)}>−</button>
+                    <button style={stepperBtn} onClick={() => updateValue('scale', axis, 0.1)}>+</button>
                   </div>
                 ))}
               </>
             )}
+
+            {/* Reset Button */}
+            <div style={{ marginTop: '8px' }}>
+            <button
+                onClick={() => resetValues(activeTool)}
+                style={{
+                backgroundColor: '#444',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '4px 10px',
+                fontSize: '12px',
+                cursor: 'pointer',
+                outline: 'none',        // ✅ Removes blue border
+                boxShadow: 'none',      // ✅ Removes shadow highlight
+                }}
+            >
+                Reset
+            </button>
+            </div>
           </div>,
           document.body
         )}
