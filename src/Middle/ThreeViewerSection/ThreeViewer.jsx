@@ -218,26 +218,28 @@ function ThickAxes({ x_length = 5 , y_length  = 5 , z_length = 5, radius = 0.05 
 // Function for the cubes that i can play with - 
 // they can accept click 
 
-function FirstCube({ position = [1, 1, 1], selected, onClick }) {
-  return (
-    <mesh
-      position={position}
-      onClick={(e) => {
-        e.stopPropagation(); // prevent canvas click deselect
-        onClick();
-      }}
-    >
-      <boxGeometry args={[5, 5, 5]} />
-      <meshStandardMaterial color={selected ? 'orange' : 'skyblue'} />
-      <Edges color={selected ? '#ff9900' : 'black'} />
-    </mesh>
-  );
-}
+// function FirstCube({ position = [1, 1, 1], selected, onClick }) {
+//   return (
+//     <mesh
+//       position={position}
+//       onClick={(e) => {
+//         e.stopPropagation(); // prevent canvas click deselect
+//         onClick();
+//       }}
+//     >
+//       <boxGeometry args={[5, 5, 5]} />
+//       <meshStandardMaterial color={selected ? 'orange' : 'skyblue'} />
+//       <Edges color={selected ? '#ff9900' : 'black'} />
+//     </mesh>
+//   );
+// }
 
-function SecondCube({ position = [10, 5, 1], selected, onClick }) {
+function FirstCube({ transform, selected, onClick }) {
   return (
     <mesh
-      position={position}
+      position={transform.position}
+      rotation={transform.rotation}
+      scale={transform.scale}
       onClick={(e) => {
         e.stopPropagation();
         onClick();
@@ -245,6 +247,41 @@ function SecondCube({ position = [10, 5, 1], selected, onClick }) {
     >
       <boxGeometry args={[5, 5, 5]} />
       <meshStandardMaterial color={selected ? 'orange' : 'green'} />
+      <Edges color={selected ? '#ff9900' : 'black'} />
+    </mesh>
+  );
+}
+
+
+// function SecondCube({ position = [10, 5, 1], selected, onClick }) {
+//   return (
+//     <mesh
+//       position={position}
+//       onClick={(e) => {
+//         e.stopPropagation();
+//         onClick();
+//       }}
+//     >
+//       <boxGeometry args={[5, 5, 5]} />
+//       <meshStandardMaterial color={selected ? 'orange' : 'green'} />
+//       <Edges color={selected ? '#ff9900' : 'black'} />
+//     </mesh>
+//   );
+// }
+
+function SecondCube({ transform, selected, onClick }) {
+  return (
+    <mesh
+      position={transform.position}
+      rotation={transform.rotation}
+      scale={transform.scale}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+    >
+      <boxGeometry args={[5, 5, 5]} />
+      <meshStandardMaterial color={selected ? 'orange' : 'skyblue'} />
       <Edges color={selected ? '#ff9900' : 'black'} />
     </mesh>
   );
@@ -533,6 +570,18 @@ function ThreeViewer() {
 
 const [selectedIds, setSelectedIds] = useState([])
 
+const [objectTransforms, setObjectTransforms] = useState({
+  first: {
+    position: [5, 15, 1],
+    rotation: [0, 0, 0],
+    scale: [1, 1, 1],
+  },
+  second: {
+    position: [10, 5, 1],
+    rotation: [0, 0, 0],
+    scale: [1, 1, 1],
+  },
+});
 
       const [sceneColor, setSceneColor] = useState(initConfig.INITIAL_SCENE_COLOR);
       const [showWelcome, setShowWelcome] = useState(true);
@@ -586,7 +635,7 @@ const [selectedIds, setSelectedIds] = useState([])
       {/* <CameraLogger /> */}
 
 
-<FirstCube
+{/* <FirstCube
   position={[5, 15, 1]}
 selected={selectedIds.includes('first')}
   onClick={() => {
@@ -600,7 +649,22 @@ selected={selectedIds.includes('second')}
   onClick={() => {
     console.log('🟩 Second Cube selected');
 setSelectedIds([ 'second' ])  }}
+/> */}
+
+
+<FirstCube
+  transform={objectTransforms['first']}
+  selected={selectedIds.includes('first')}
+  onClick={() => setSelectedIds(['first'])}
 />
+
+<SecondCube
+  transform={objectTransforms['second']}
+  selected={selectedIds.includes('second')}
+  onClick={() => setSelectedIds(['second'])}
+/>
+
+
 
       <GizmoHelper alignment="bottom-left" margin={[50, 50]}>
       <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" hideNegativeAxes={true} />
@@ -641,7 +705,13 @@ setSelectedIds([ 'second' ])  }}
 
         
       <ObjectManuplationGUI />
-<TransformObjectGUI selectedIds={selectedIds} />
+
+{/* <TransformObjectGUI selectedIds={selectedIds} /> */}
+<TransformObjectGUI
+  selectedIds={selectedIds}
+  objectTransforms={objectTransforms}
+  setObjectTransforms={setObjectTransforms}
+/>
 
 
       {showWelcome && <WelcomeToast ref={welcomeRef} />}

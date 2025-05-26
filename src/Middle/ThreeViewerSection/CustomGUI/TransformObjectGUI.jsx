@@ -1,61 +1,97 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import * as THREE from 'three';
 import 'remixicon/fonts/remixicon.css';
 
-export default function TransformObjectGUI({ selectedId }) {
+export default function TransformObjectGUI({ selectedIds, objectTransforms, setObjectTransforms }) {
+  const selectedId = selectedIds[0];
+  if (!selectedId) return null;
+
+  const transform = objectTransforms[selectedId];
   const [activeTool, setActiveTool] = useState(null);
   const [scaleLocked, setScaleLocked] = useState(true);
-
-  const [dummyValues, setDummyValues] = useState({
-    translate: { x: 0, y: 0, z: 0 },
-    rotate: { x: 0, y: 0, z: 0 },
-    scale: { x: 1, y: 1, z: 1 },
-  });
 
   const TOOLBAR_LEFT_PX = 550;
   const TOOLBAR_BOTTOM_PX = 20;
   const PANEL_BOTTOM_PX = 75;
 
+  const axisIndex = (axis) => (axis === 'x' ? 0 : axis === 'y' ? 1 : 2);
+
   const handleToolClick = (tool) => {
     setActiveTool((prev) => (prev === tool ? null : tool));
   };
 
-  const updateValue = (tool, axis, delta) => {
-    setDummyValues((prev) => {
-      const updated = { ...prev[tool] };
-      const newValue = parseFloat((updated[axis] + delta).toFixed(2));
+ const updateValue = (tool, axis, delta) => {
+  setObjectTransforms((prev) => {
+    const current = prev[selectedId];
+    const i = axisIndex(axis);
 
-      if (tool === 'scale' && scaleLocked) {
-        return {
-          ...prev,
-          scale: { x: newValue, y: newValue, z: newValue },
-        };
+    const newPosition = [...current.position];
+    const newRotation = [...current.rotation];
+    const newScale = [...current.scale];
+
+    if (tool === 'translate') {
+      newPosition[i] += delta;
+    } else if (tool === 'rotate') {
+      newRotation[i] += THREE.MathUtils.degToRad(delta);
+    } else if (tool === 'scale') {
+      if (scaleLocked) {
+        const change = newScale[i] + delta;
+        newScale[0] = change;
+        newScale[1] = change;
+        newScale[2] = change;
       } else {
-        updated[axis] = newValue;
-        return {
-          ...prev,
-          [tool]: updated,
-        };
+        newScale[i] += delta;
       }
-    });
-  };
+    }
 
-  const syncScaleToSmallest = () => {
-    const { x, y, z } = dummyValues.scale;
-    const smallest = Math.min(x, y, z);
-    setDummyValues((prev) => ({
+    return {
       ...prev,
-      scale: { x: smallest, y: smallest, z: smallest },
-    }));
-  };
+      [selectedId]: {
+        ...current,
+        position: newPosition,
+        rotation: newRotation,
+        scale: newScale,
+      },
+    };
+  });
+};
 
   const resetValues = (tool) => {
     const defaults = {
-      translate: { x: 0, y: 0, z: 0 },
-      rotate: { x: 0, y: 0, z: 0 },
-      scale: { x: 1, y: 1, z: 1 },
+      translate: [0, 0, 0],
+      rotate: [0, 0, 0],
+      scale: [1, 1, 1],
     };
-    setDummyValues((prev) => ({ ...prev, [tool]: defaults[tool] }));
+
+    setObjectTransforms((prev) => ({
+      ...prev,
+      [selectedId]: {
+        ...prev[selectedId],
+        position: tool === 'translate' ? [...defaults.translate] : prev[selectedId].position,
+        rotation: tool === 'rotate' ? [...defaults.rotate] : prev[selectedId].rotation,
+        scale: tool === 'scale' ? [...defaults.scale] : prev[selectedId].scale,
+      },
+    }));
+  };
+
+  const syncScaleToSmallest = () => {
+    const smallest = Math.min(...transform.scale);
+    setObjectTransforms((prev) => ({
+      ...prev,
+      [selectedId]: {
+        ...prev[selectedId],
+        scale: [smallest, smallest, smallest],
+      },
+    }));
+  };
+
+  const getDisplayValue = (tool, axis) => {
+    const i = axisIndex(axis);
+    if (tool === 'translate') return `${transform.position[i].toFixed(2)} cm`;
+    if (tool === 'rotate') return `${THREE.MathUtils.radToDeg(transform.rotation[i]).toFixed(2)}°`;
+    if (tool === 'scale') return `${transform.scale[i].toFixed(2)}`;
+    return '';
   };
 
   const axisColors = {
@@ -100,7 +136,7 @@ export default function TransformObjectGUI({ selectedId }) {
 
   return (
     <>
-      {/* Bottom Toolbar */}
+      {/* Toolbar */}
       <div
         style={{
           position: 'absolute',
@@ -153,7 +189,7 @@ export default function TransformObjectGUI({ selectedId }) {
         ))}
       </div>
 
-      {/* Floating Panel */}
+      {/* Transform Panel */}
       {activeTool &&
         createPortal(
           <div
@@ -192,7 +228,7 @@ export default function TransformObjectGUI({ selectedId }) {
                   <span style={{ width: '12px', fontWeight: 600, color: axisColors[axis] }}>{axis}</span>
                   <input
                     type="text"
-                    value={`${dummyValues[activeTool][axis].toFixed(2)} ${activeTool === 'rotate' ? '°' : 'cm'}`}
+                    value={getDisplayValue(activeTool, axis)}
                     readOnly
                     style={valueInputStyle}
                   />
@@ -243,7 +279,7 @@ export default function TransformObjectGUI({ selectedId }) {
                     <span style={{ width: '12px', fontWeight: 600, color: axisColors[axis] }}>{axis}</span>
                     <input
                       type="text"
-                      value={dummyValues.scale[axis].toFixed(2)}
+                      value={getDisplayValue('scale', axis)}
                       readOnly
                       style={valueInputStyle}
                     />
@@ -256,22 +292,22 @@ export default function TransformObjectGUI({ selectedId }) {
 
             {/* Reset Button */}
             <div style={{ marginTop: '8px' }}>
-            <button
+              <button
                 onClick={() => resetValues(activeTool)}
                 style={{
-                backgroundColor: '#444',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '4px 10px',
-                fontSize: '12px',
-                cursor: 'pointer',
-                outline: 'none',        // ✅ Removes blue border
-                boxShadow: 'none',      // ✅ Removes shadow highlight
+                  backgroundColor: '#444',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '4px 10px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  outline: 'none',
+                  boxShadow: 'none',
                 }}
-            >
+              >
                 Reset
-            </button>
+              </button>
             </div>
           </div>,
           document.body
