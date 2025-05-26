@@ -41,7 +41,7 @@ export const useSceneStore = create((set) => ({
         {
           id: 'cube_2',
           type: 'cube',
-          position: [1, 2, 0],
+          position: [10, 30, 0],
           rotation: [0, 0, 0],
           scale: [1, 1, 1],
           original: {
@@ -53,7 +53,7 @@ export const useSceneStore = create((set) => ({
         {
           id: 'sphere_2',
           type: 'sphere',
-          position: [5, 1, 0],
+          position: [5, 10, 0],
           rotation: [0, 0, 0],
           scale: [1, 1, 1],
           original: {
@@ -65,7 +65,7 @@ export const useSceneStore = create((set) => ({
         {
           id: 'cone_1',
           type: 'cone',
-          position: [0, 4, 0],
+          position: [0, 20, 0],
           rotation: [0, 0, 0],
           scale: [1, 1, 1],
           original: {
@@ -82,7 +82,7 @@ export const useSceneStore = create((set) => ({
         {
           id: 'cube_3',
           type: 'cube',
-          position: [-2, -1, 0],
+          position: [10, 12.5, 0],
           rotation: [0, 0, 0],
           scale: [1, 1, 1],
           original: {
@@ -94,8 +94,8 @@ export const useSceneStore = create((set) => ({
         {
           id: 'cone_2',
           type: 'cone',
-          position: [2, -2, 0],
-          rotation: [0, 0, 0],
+          position: [2, 20, 0],
+          rotation: [1, 0, 0],
           scale: [1, 1, 1],
           original: {
             position: [2, -2, 0],

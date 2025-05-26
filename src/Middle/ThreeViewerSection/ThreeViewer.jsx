@@ -631,12 +631,12 @@ const currentPlate = plates.find((p) => p.id === selectedPlateId);
 
       
       <>
-      {/* <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} /> */}
 
-      {/* Top-left UI controls */}
+
+{/* 
 <div style={{ position: 'absolute', top: 200, left: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
 
-  {/* Select Plate Dropdown */}
+ 
   <label style={{ fontFamily: 'monospace', fontSize: '14px' }}>
     Select Plate:
     <select
@@ -658,7 +658,7 @@ const currentPlate = plates.find((p) => p.id === selectedPlateId);
     </select>
   </label>
 
-  {/* Export Button */}
+ 
   <button
     onClick={() => {
       const { plates, selectedPlateId } = useSceneStore.getState();
@@ -685,6 +685,62 @@ const currentPlate = plates.find((p) => p.id === selectedPlateId);
     }}
   >
     📦 Export Scene Store
+  </button>
+</div> */}
+
+<div style={{ position: 'absolute', top: 200, left: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
+  {/* Vertical Plate Menu */}
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+    <span style={{ fontFamily: 'monospace', fontSize: '14px', marginBottom: '2px' }}>Select Plate:</span>
+    {plates.map((plate) => (
+      <button
+        key={plate.id}
+        onClick={() => setSelectedPlateId(plate.id)}
+        style={{
+          padding: '6px 12px',
+          fontSize: '13px',
+          fontFamily: 'monospace',
+          borderRadius: '6px',
+          border: selectedPlateId === plate.id ? '2px solid #000' : '1px solid #aaa',
+          backgroundColor: selectedPlateId === plate.id ? '#e6e6e6' : '#f7f7f7',
+          cursor: 'pointer',
+          textAlign: 'left',
+          width: '120px',
+        }}
+      >
+        {plate.id}
+      </button>
+    ))}
+  </div>
+
+  {/* Export Button */}
+  <button
+    onClick={() => {
+      const { plates, selectedPlateId } = useSceneStore.getState();
+      const exportData = { plates, selectedPlateId };
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sceneStoreExport.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }}
+    style={{
+      padding: '6px 12px',
+      fontSize: '13px',
+      fontFamily: 'monospace',
+      borderRadius: '6px',
+      border: '1px solid #aaa',
+      backgroundColor: '#f0e7e7',
+      cursor: 'pointer',
+      width: '120px',
+    }}
+  >
+    📦 Export Scene
   </button>
 </div>
 
