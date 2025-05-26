@@ -53,7 +53,7 @@ export const useSceneStore = create((set) => ({
         {
           id: 'sphere_2',
           type: 'sphere',
-          position: [5, 10, 0],
+          position: [6, 10, 0],
           rotation: [0, 0, 0],
           scale: [1, 1, 1],
           original: {
