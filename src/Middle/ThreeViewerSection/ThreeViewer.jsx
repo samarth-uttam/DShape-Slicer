@@ -28,6 +28,9 @@ import DarkModeToggle from './CustomGUI/DarkModeToggle'
 import * as initConfig from '../../config/InitConfig';
 
 
+// import temp_01 from '../../tempFunctions/temp_01.jsx';
+
+
 import 'react-toastify/dist/ReactToastify.css';
 import '../../styles/toast.css';
 
@@ -40,6 +43,7 @@ import { TOAST_COLORS } from '../../config/InitConfig';
 
 
 const time = new Date().toLocaleTimeString();
+
 //---------------------------------------------------------------------- PRINTABLE AREA OBJECTS --------------------------------------------------------------- : 
 
 function BasePlateWithGridCombined({
@@ -182,6 +186,7 @@ function BasePlateWithGridCombined({
   );
 }
 
+// This is the colored axis on the build plate itself 
 
 
 function ThickAxes({ x_length = 5 , y_length  = 5 , z_length = 5, radius = 0.05 }) {
@@ -303,60 +308,6 @@ function AxisHelper({ size = 100 }) {
 
 
 
-// control panel for the models in the scene
-
-function ModelTogglePanel({ models, toggleVisibility, selectModel }) {
-  return (
-    <div style={{
-      position: 'absolute',
-      top: '50%',
-      left: 10,
-      transform: 'translateY(-50%)',
-      background: 'rgba(30, 30, 30, 0.9)',
-      border: '1px solid rgba(255,255,255,0.15)',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-      padding: '12px',
-      borderRadius: '10px',
-      color: 'white',
-      fontFamily: 'monospace',
-      fontSize: '14px',
-      zIndex: 10,
-      maxHeight: '80vh',
-      overflowY: 'auto',
-      width: '200px'
-    }}>
-      <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>List of Objects</div>
-      {models.map(model => (
-        <div key={model.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-          <span
-            onClick={() => toggleVisibility(model.id)}
-            style={{
-              cursor: 'pointer',
-              marginRight: '10px',
-              color: model.visible ? 'orange' : 'gray'
-            }}
-          >
-            {model.visible ? <Eye size={16} /> : <EyeOff size={16} />}
-          </span>
-          <span
-            onClick={() => selectModel(model.id)}
-            style={{
-              cursor: 'pointer',
-              fontWeight: model.selected ? 'bold' : 'normal',
-              textDecoration: model.selected ? 'underline' : 'none'
-            }}
-          >
-            {model.name}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-
-
-
 
 // making the canvas 
 
@@ -451,63 +402,10 @@ function CameraControls({
       dampingFactor={dampingFactor}
       panSpeed={0.5}
       zoomSpeed={0.2}
+
     />
   );
 }
-
-
-
-
-// adding the grid to the scene 
-
-function XYGrid() {
-  return (
-    <Grid
-      position={[0, 0, 0]}       // center of the scene
-      args={[200, 200]}            // width and height of the grid
-      cellSize={1}
-      cellThickness={0.5}
-      cellColor="gray"
-      sectionColor="black"
-      fadeDistance={50}
-      fadeStrength={0}
-   rotation={[ -Math.PI / 2,0, 0]}
-    />
-  )
-}
-
-
-function getSceneObjects() {
-  return [
-    { id: 'ico-1',
-      name: 'Icosahedron',
-      Component: Icosahedron ,
-      defaults: { position: [5, 1, 1], rotation: [0, 0, 0]}
-    },
-
-    { id: 'box-1',
-      name: 'SecondBox',
-      Component: SecondBox,
-      defaults: { position: [10, 3, 3], rotation: [0, 0, 0] }},
-
-
-    { id: 'tor-1',
-      name: 'TorusKnot',
-      Component: TorusKnot,
-      defaults: { position: [0, 0, 0], rotation: [0, 0, 0]}}
-    
-    ]
-}
-
-function handlePointerMissedFactory(setSelected) {
-  return (e) => {
-    if (e.button === 0) {
-      setSelected(null);
-    }
-  };
-}
-
-
 
 
 
@@ -573,6 +471,25 @@ const WelcomeToast = React.forwardRef((_, ref) => (
 ));
 
 
+// a function to see teh camera position and target in the console
+
+function CameraLogger() {
+  useFrame(() => {
+    if (cameraRef.current) {
+      const pos = cameraRef.current.object.position;
+      const target = cameraRef.current.target;
+
+      console.log('🎯 Camera Position:');
+      console.log(`x: ${pos.x.toFixed(2)}\ny: ${pos.y.toFixed(2)}\nz: ${pos.z.toFixed(2)}`);
+
+      console.log('🔽 Camera Target:');
+      console.log(`x: ${target.x.toFixed(2)}\ny: ${target.y.toFixed(2)}\nz: ${target.z.toFixed(2)}`);
+    }
+  });
+
+  return null;
+}
+
 
 // This is the main threeviewer Function 
 
@@ -615,6 +532,8 @@ function ThreeViewer() {
           box_height={initConfig.INITIAL_BUILD_PLATE_z} />
 
       <ThickAxes x_length={20} y_length={40} z_length={10} radius={0.02} />
+      <CameraLogger />
+
 
 
       <OriginalCube color="skyblue" />
