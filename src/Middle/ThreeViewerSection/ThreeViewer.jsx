@@ -218,7 +218,7 @@ function ThickAxes({ x_length = 5 , y_length  = 5 , z_length = 5, radius = 0.05 
 // Rendering the Original Isocahedron
 
 
-function OriginalCube({
+function FirstCube({
   color = 'skyblue',
   position = [1, 1, 1],
   rotation = [0, 0, 0],
@@ -226,7 +226,7 @@ function OriginalCube({
 }) {
   return (
     <mesh position={position} rotation={rotation}>
-      <boxGeometry args={[1, 1, 1]} />
+      <boxGeometry args={[5, 5, 5]} />
       <meshStandardMaterial color={color} />
       <Edges
         scale={1}         // Slightly outside the box
@@ -236,6 +236,26 @@ function OriginalCube({
     </mesh>
   );
 }
+
+function SecondCube({
+  color = 'skyblue',
+  position = [5, 15, 1],
+  rotation = [0, 0, 0],
+  edgeColor = 'black'
+}) {
+  return (
+    <mesh position={position} rotation={rotation}>
+      <boxGeometry args={[5, 5, 5]} />
+      <meshStandardMaterial color={color} />
+      <Edges
+        scale={1}         // Slightly outside the box
+        threshold={15}       // Lower = more edge detail
+        color={edgeColor}    // Outline color
+      />
+    </mesh>
+  );
+}
+
 
 // Rendering the Icosahedron
 function Icosahedron({ color = 'hotpink',position , rotation}) {
@@ -509,6 +529,8 @@ function CameraLogger() {
 }
 
 
+
+
 // This is the main threeviewer Function 
 
 
@@ -528,8 +550,12 @@ function ThreeViewer() {
         };
 
 
+
+
     return (
 
+
+      
       <>
       {/* <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} /> */}
 
@@ -554,7 +580,8 @@ function ThreeViewer() {
 
 
 
-      <OriginalCube color="skyblue" />
+      <FirstCube color="skyblue" position={[5, 15, 1]} />
+      <SecondCube color="green" position={[10, 5, 1]} />
 
       <GizmoHelper alignment="bottom-left" margin={[50, 50]}>
       <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" hideNegativeAxes={true} />
