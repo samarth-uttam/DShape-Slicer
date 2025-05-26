@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import 'remixicon/fonts/remixicon.css';
 
-export default function TransformObjectGUI() {
+export default function TransformObjectGUI({ selectedId }) {
   const [activeTool, setActiveTool] = useState(null);
   const [scaleLocked, setScaleLocked] = useState(true);
 

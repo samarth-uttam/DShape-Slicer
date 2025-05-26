@@ -215,46 +215,41 @@ function ThickAxes({ x_length = 5 , y_length  = 5 , z_length = 5, radius = 0.05 
 }
 
 
-// Rendering the Original Isocahedron
+// Function for the cubes that i can play with - 
+// they can accept click 
 
-
-function FirstCube({
-  color = 'skyblue',
-  position = [1, 1, 1],
-  rotation = [0, 0, 0],
-  edgeColor = 'black'
-}) {
+function FirstCube({ position = [1, 1, 1], selected, onClick }) {
   return (
-    <mesh position={position} rotation={rotation}>
+    <mesh
+      position={position}
+      onClick={(e) => {
+        e.stopPropagation(); // prevent canvas click deselect
+        onClick();
+      }}
+    >
       <boxGeometry args={[5, 5, 5]} />
-      <meshStandardMaterial color={color} />
-      <Edges
-        scale={1}         // Slightly outside the box
-        threshold={15}       // Lower = more edge detail
-        color={edgeColor}    // Outline color
-      />
+      <meshStandardMaterial color={selected ? 'orange' : 'skyblue'} />
+      <Edges color={selected ? '#ff9900' : 'black'} />
     </mesh>
   );
 }
 
-function SecondCube({
-  color = 'skyblue',
-  position = [5, 15, 1],
-  rotation = [0, 0, 0],
-  edgeColor = 'black'
-}) {
+function SecondCube({ position = [10, 5, 1], selected, onClick }) {
   return (
-    <mesh position={position} rotation={rotation}>
+    <mesh
+      position={position}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+    >
       <boxGeometry args={[5, 5, 5]} />
-      <meshStandardMaterial color={color} />
-      <Edges
-        scale={1}         // Slightly outside the box
-        threshold={15}       // Lower = more edge detail
-        color={edgeColor}    // Outline color
-      />
+      <meshStandardMaterial color={selected ? 'orange' : 'green'} />
+      <Edges color={selected ? '#ff9900' : 'black'} />
     </mesh>
   );
 }
+
 
 
 // Rendering the Icosahedron
@@ -536,6 +531,8 @@ function CameraLogger() {
 
 function ThreeViewer() {
 
+const [selectedIds, setSelectedIds] = useState([])
+
 
       const [sceneColor, setSceneColor] = useState(initConfig.INITIAL_SCENE_COLOR);
       const [showWelcome, setShowWelcome] = useState(true);
@@ -559,7 +556,17 @@ function ThreeViewer() {
       <>
       {/* <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} /> */}
 
-      <SceneCanvas>
+<SceneCanvas onPointerMissed={() => {
+  if (selectedIds.length > 0) {
+  console.log('🛑 Deselected');
+  setSelectedIds([]);
+} else {
+  console.log('🕳️ Clicked empty canvas, but nothing was selected.');
+}
+
+}}>
+
+  
       <color attach="background" args={[sceneColor]} />
 
       <ambientLight intensity={0.5} />
@@ -579,9 +586,21 @@ function ThreeViewer() {
       {/* <CameraLogger /> */}
 
 
+<FirstCube
+  position={[5, 15, 1]}
+selected={selectedIds.includes('first')}
+  onClick={() => {
+    console.log('🟦 First Cube selected');
+setSelectedIds([ 'first' ])  }}
+/>
 
-      <FirstCube color="skyblue" position={[5, 15, 1]} />
-      <SecondCube color="green" position={[10, 5, 1]} />
+<SecondCube
+  position={[10, 5, 1]}
+selected={selectedIds.includes('second')}
+  onClick={() => {
+    console.log('🟩 Second Cube selected');
+setSelectedIds([ 'second' ])  }}
+/>
 
       <GizmoHelper alignment="bottom-left" margin={[50, 50]}>
       <GizmoViewport axisColors={['#9d4b4b', '#2f7f4f', '#3b5b9d']} labelColor="white" hideNegativeAxes={true} />
@@ -622,7 +641,7 @@ function ThreeViewer() {
 
         
       <ObjectManuplationGUI />
-      <TransformObjectGUI/>
+<TransformObjectGUI selectedIds={selectedIds} />
 
 
       {showWelcome && <WelcomeToast ref={welcomeRef} />}
