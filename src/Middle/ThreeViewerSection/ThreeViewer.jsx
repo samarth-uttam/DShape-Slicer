@@ -27,6 +27,7 @@ import ObjectManuplationGUI from './CustomGUI/ObjectManuplationGUI'
 import DarkModeToggle from './CustomGUI/DarkModeToggle'
 import * as initConfig from '../../config/InitConfig';
 import TransformObjectGUI from './CustomGUI/TransformObjectGUI';
+import { useSceneStore } from '../../Store/sceneStore';
 
 
 // import temp_01 from '../../tempFunctions/temp_01.jsx';
@@ -287,6 +288,23 @@ function SecondCube({ transform, selected, onClick }) {
   );
 }
 
+function ConeObject({ transform, selected, onClick }) {
+  return (
+    <mesh
+      position={transform.position}
+      rotation={transform.rotation}
+      scale={transform.scale}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+    >
+      <coneGeometry args={[2, 10, 32]} />
+      <meshStandardMaterial color={selected ? 'orange' : 'red'} />
+      <Edges color={selected ? '#ff9900' : 'black'} />
+    </mesh>
+  );
+}
 
 
 // Rendering the Icosahedron
@@ -568,20 +586,25 @@ function CameraLogger() {
 
 function ThreeViewer() {
 
-const [selectedIds, setSelectedIds] = useState([])
 
-const [objectTransforms, setObjectTransforms] = useState({
-  first: {
-    position: [5, 15, 1],
-    rotation: [0, 0, 0],
-    scale: [1, 1, 1],
-  },
-  second: {
-    position: [10, 5, 1],
-    rotation: [0, 0, 0],
-    scale: [1, 1, 1],
-  },
-});
+      const plates = useSceneStore((state) => state.plates);
+      const selectedPlateId = useSceneStore((state) => state.selectedPlateId);
+      const setSelectedPlateId = useSceneStore((state) => state.setSelectedPlateId);
+
+      const [selectedIds, setSelectedIds] = useState([])
+
+      const [objectTransforms, setObjectTransforms] = useState({
+      first: {
+        position: [5, 15, 1],
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1],
+      },
+      second: {
+        position: [10, 5, 1],
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1],
+      },
+      });
 
       const [sceneColor, setSceneColor] = useState(initConfig.INITIAL_SCENE_COLOR);
       const [showWelcome, setShowWelcome] = useState(true);
@@ -589,11 +612,16 @@ const [objectTransforms, setObjectTransforms] = useState({
       const handleRealToast = () => setShowWelcome(false);
 
       const removeWelcomeToast = () => 
-        {
-          if (welcomeRef.current) {
-          welcomeRef.current.remove();
-          }
-        };
+      {
+        if (welcomeRef.current) {
+        welcomeRef.current.remove();
+        }
+      };
+
+
+// Get the current plate (null if not found)
+const currentPlate = plates.find((p) => p.id === selectedPlateId);
+
 
 
 
@@ -604,6 +632,62 @@ const [objectTransforms, setObjectTransforms] = useState({
       
       <>
       {/* <Leva titleBar={{ title: 'Controls', drag: true }} collapsed={true} /> */}
+
+      {/* Top-left UI controls */}
+<div style={{ position: 'absolute', top: 200, left: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
+  {/* Select Plate Dropdown */}
+  <label style={{ fontFamily: 'monospace', fontSize: '14px' }}>
+    Select Plate:
+    <select
+      style={{
+        marginLeft: '10px',
+        padding: '4px 8px',
+        fontSize: '14px',
+        borderRadius: '6px',
+        border: '1px solid #aaa',
+      }}
+      value={selectedPlateId}
+      onChange={(e) => setSelectedPlateId(e.target.value)}
+    >
+      {plates.map((plate) => (
+        <option key={plate.id} value={plate.id}>
+          {plate.id}
+        </option>
+      ))}
+    </select>
+  </label>
+
+  {/* Export Button */}
+  <button
+    onClick={() => {
+      const { plates, selectedPlateId } = useSceneStore.getState();
+      const exportData = { plates, selectedPlateId };
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sceneStoreExport.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }}
+    style={{
+      padding: '6px 12px',
+      fontSize: '13px',
+      fontFamily: 'monospace',
+      borderRadius: '6px',
+      border: '1px solid #aaa',
+      backgroundColor: '#f7f7f7',
+      cursor: 'pointer',
+      alignSelf: 'flex-start',
+    }}
+  >
+    📦 Export Scene Store
+  </button>
+</div>
+
 
 <SceneCanvas onPointerMissed={() => {
   if (selectedIds.length > 0) {
@@ -651,7 +735,7 @@ selected={selectedIds.includes('second')}
 setSelectedIds([ 'second' ])  }}
 /> */}
 
-
+{/* 
 <FirstCube
   transform={objectTransforms['first']}
   selected={selectedIds.includes('first')}
@@ -662,7 +746,63 @@ setSelectedIds([ 'second' ])  }}
   transform={objectTransforms['second']}
   selected={selectedIds.includes('second')}
   onClick={() => setSelectedIds(['second'])}
-/>
+/> */}
+
+{currentPlate?.objects.map((obj) => {
+  const isSelected = selectedIds.includes(obj.id);
+  const transform = obj;
+
+  if (obj.type === 'cube') {
+    return (
+      <FirstCube
+        key={obj.id}
+        transform={transform}
+        selected={isSelected}
+        onClick={() => setSelectedIds([obj.id])}
+      />
+    );
+  }
+
+  if (obj.type === 'sphere') {
+    return (
+      <mesh
+        key={obj.id}
+        position={obj.position}
+        rotation={obj.rotation}
+        scale={obj.scale}
+        onClick={(e) => {
+          e.stopPropagation();
+          setSelectedIds([obj.id]);
+        }}
+      >
+        <sphereGeometry args={[2, 32, 32]} />
+        <meshStandardMaterial color={isSelected ? 'orange' : 'blue'} />
+        <Edges color={isSelected ? '#ff9900' : 'black'} />
+      </mesh>
+    );
+  }
+
+  if (obj.type === 'cone') {
+    return (
+      <mesh
+        key={obj.id}
+        position={obj.position}
+        rotation={obj.rotation}
+        scale={obj.scale}
+        onClick={(e) => {
+          e.stopPropagation();
+          setSelectedIds([obj.id]);
+        }}
+      >
+        <coneGeometry args={[2, 3, 32]} />
+        <meshStandardMaterial color={isSelected ? 'orange' : 'red'} />
+        <Edges color={isSelected ? '#ff9900' : 'black'} />
+      </mesh>
+    );
+  }
+
+  return null;
+})}
 
 
 
@@ -706,12 +846,16 @@ setSelectedIds([ 'second' ])  }}
         
       <ObjectManuplationGUI />
 
+
+
+<TransformObjectGUI selectedIds={selectedIds} />
+
 {/* <TransformObjectGUI selectedIds={selectedIds} /> */}
-<TransformObjectGUI
+{/* <TransformObjectGUI
   selectedIds={selectedIds}
   objectTransforms={objectTransforms}
   setObjectTransforms={setObjectTransforms}
-/>
+/> */}
 
 
       {showWelcome && <WelcomeToast ref={welcomeRef} />}
