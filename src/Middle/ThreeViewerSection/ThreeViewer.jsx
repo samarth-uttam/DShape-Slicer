@@ -26,6 +26,7 @@ import ZoomControlsIconToolbar from './CustomGUI/ZoomControlsIconToolbar'
 import ObjectManuplationGUI from './CustomGUI/ObjectManuplationGUI'
 import DarkModeToggle from './CustomGUI/DarkModeToggle'
 import * as initConfig from '../../config/InitConfig';
+import TransformObjectGUI from './CustomGUI/TransformObjectGUI';
 
 
 // import temp_01 from '../../tempFunctions/temp_01.jsx';
@@ -561,6 +562,7 @@ function ThreeViewer() {
 
 
       </SceneCanvas>
+     
 
       {/* This is the dark mode toggle. it takes the dark mode status from the parent file */}
 
@@ -593,6 +595,7 @@ function ThreeViewer() {
 
         
       <ObjectManuplationGUI />
+      <TransformObjectGUI/>
 
 
       {showWelcome && <WelcomeToast ref={welcomeRef} />}

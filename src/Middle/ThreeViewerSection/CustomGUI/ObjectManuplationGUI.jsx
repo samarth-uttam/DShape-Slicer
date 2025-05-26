@@ -16,7 +16,7 @@ export default function ObjectManuplationGUI() {
       style={{
         position: 'absolute',
         bottom: 20,
-        left: 400,
+        left: 700,
         display: 'flex',
         flexDirection: 'row',
         gap: '1px',
