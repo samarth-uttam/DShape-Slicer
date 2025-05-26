@@ -1,6 +1,6 @@
 import 'remixicon/fonts/remixicon.css';
 
-export default function ZoomControlsIconToolbar({onHomeClick}) {
+export default function ZoomControlsIconToolbar({onHomeClick ,   HandleZoomOutClick, HandleZoomInClick}) {
   const buttons = [
     {
       iconClass: 'ri-home-fill',
@@ -17,12 +17,24 @@ export default function ZoomControlsIconToolbar({onHomeClick}) {
     {
       iconClass: 'ri-zoom-in-line',
       // label: 'Zoom In',
-      onClick: () => alert('Zoom In button clicked'),
+          
+      onClick: () => {
+        console.log('🟢 Zoom IN button clicked');
+        if (HandleZoomOutClick) HandleZoomOutClick();  // call parent’s function
+      },
+
+
     },
     {
       iconClass: 'ri-zoom-out-line',
       // label: 'Zoom Out',
-      onClick: () => alert('Zoom Out button clicked'),
+          
+      onClick: () => {
+        console.log('🟢 Zoom Out button clicked');
+        if (HandleZoomInClick) HandleZoomInClick();  // call parent’s function
+      },
+
+
     },
   ];
 

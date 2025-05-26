@@ -427,7 +427,24 @@ export function handleHomeClick(onFirstToast) {
   }
 }
 
+export function HandleZoomInClick(onFirstToast) {
+  if (cameraRef.current) {
+    cameraRef.current.dollyIn(1.1);  // Smaller value = slower zoom
+    cameraRef.current.update();      // Must call this
 
+      showToast('Zoomed in Successfully!', onFirstToast);
+  }
+}
+
+export function HandleZoomOutClick(onFirstToast) {
+  if (cameraRef.current) {
+    cameraRef.current.dollyOut(1.1); // Smaller value = slower zoom
+    cameraRef.current.update();
+
+          showToast('Zoomed Out Successfully!', onFirstToast);
+
+  }
+}
 
 
 // At the top or in a separate utils.js file
@@ -532,7 +549,7 @@ function ThreeViewer() {
           box_height={initConfig.INITIAL_BUILD_PLATE_z} />
 
       <ThickAxes x_length={20} y_length={40} z_length={10} radius={0.02} />
-      <CameraLogger />
+      {/* <CameraLogger /> */}
 
 
 
@@ -564,8 +581,15 @@ function ThreeViewer() {
 
 
 
-      <ZoomControlsIconToolbar onHomeClick={() => handleHomeClick(removeWelcomeToast)} />
+      {/* <ZoomControlsIconToolbar onHomeClick={() => handleHomeClick(removeWelcomeToast) 
+        
+      } /> */}
 
+<ZoomControlsIconToolbar
+  onHomeClick={() => handleHomeClick(removeWelcomeToast)}
+  HandleZoomInClick={() =>HandleZoomInClick(removeWelcomeToast)}
+  HandleZoomOutClick={() =>HandleZoomOutClick(removeWelcomeToast)}
+/>
 
         
       <ObjectManuplationGUI />
