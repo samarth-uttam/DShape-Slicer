@@ -37,34 +37,42 @@ export default function TransformObjectGUI({ selectedIds }) {
       rotation: [...transform.rotation],
       scale: [...transform.scale],
     };
+
     if (tool === 'translate') {
       updated.position[axisIndex(axis)] += delta;
     } else if (tool === 'rotate') {
       updated.rotation[axisIndex(axis)] += (delta * Math.PI) / 180;
     } else if (tool === 'scale') {
-      updated.scale[axisIndex(axis)] += delta;
+      const newVal = updated.scale[axisIndex(axis)] + delta;
+      const clamped = Math.min(Math.max(newVal, 0.1), 5);
+
+      if (scaleLocked) {
+        updated.scale = [clamped, clamped, clamped];
+      } else {
+        updated.scale[axisIndex(axis)] = clamped;
+      }
     }
+
     updateObjectTransform(selectedPlateId, selectedId, updated);
   };
 
   const resetTool = () => {
-  if (!transform || !activeTool) return;
+    if (!transform || !activeTool) return;
+    const original = transform.original;
+    if (!original) return;
 
-  const original = transform.original;
-  if (!original) return;
+    const reset = {
+      position: [...transform.position],
+      rotation: [...transform.rotation],
+      scale: [...transform.scale],
+    };
 
-  const reset = {
-    position: [...transform.position],
-    rotation: [...transform.rotation],
-    scale: [...transform.scale],
+    if (activeTool === 'translate') reset.position = [...original.position];
+    if (activeTool === 'rotate') reset.rotation = [...original.rotation];
+    if (activeTool === 'scale') reset.scale = [...original.scale];
+
+    updateObjectTransform(selectedPlateId, selectedId, reset);
   };
-
-  if (activeTool === 'translate') reset.position = [...original.position];
-  if (activeTool === 'rotate') reset.rotation = [...original.rotation];
-  if (activeTool === 'scale') reset.scale = [...original.scale];
-
-  updateObjectTransform(selectedPlateId, selectedId, reset);
-};
 
   const buttons = [
     { key: 'translate', iconClass: 'ri-drag-move-2-fill', label: 'Translate' },
@@ -88,8 +96,30 @@ export default function TransformObjectGUI({ selectedIds }) {
     boxShadow: 'none',
   };
 
+const handleScaleLockToggle = () => {
+  if (!transform) return;
+
+  const { scale } = transform;
+  const smallest = Math.max(0.1, Math.min(...scale));
+
+  // Toggle lock state
+  const nextLocked = !scaleLocked;
+  setScaleLocked(nextLocked);
+
+  // If locking, immediately set all axes to the smallest value
+  if (nextLocked) {
+    updateObjectTransform(selectedPlateId, selectedId, {
+      ...transform,
+      scale: [smallest, smallest, smallest],
+    });
+  }
+};
+
+
+
   return (
     <>
+      {/* Toolbar */}
       <div
         style={{
           position: 'absolute',
@@ -98,11 +128,12 @@ export default function TransformObjectGUI({ selectedIds }) {
           transform: 'translateX(-50%)',
           display: 'flex',
           gap: '1px',
-          backgroundColor: isDisabled ? 'rgba(160,90,90,0.4)' : 'rgba(202, 202, 214, 0.8)',
+          backgroundColor: isDisabled ? 'rgba(236, 237, 243, 0.4)' : 'rgba(202, 202, 214, 0.8)',
           padding: '8px 12px',
           borderRadius: '10px',
           zIndex: 9999,
           pointerEvents: isDisabled ? 'none' : 'auto',
+          cursor: isDisabled ? 'not-allowed' : 'default',
         }}
       >
         {buttons.map((btn) => (
@@ -113,7 +144,7 @@ export default function TransformObjectGUI({ selectedIds }) {
             style={{
               background: 'transparent',
               border: 'none',
-              cursor: isDisabled ? 'default' : 'pointer',
+              cursor: isDisabled ? 'not-allowed' : 'pointer',
               padding: '5px 10px',
               display: 'flex',
               alignItems: 'center',
@@ -143,6 +174,7 @@ export default function TransformObjectGUI({ selectedIds }) {
         ))}
       </div>
 
+      {/* Control Panel */}
       {activeTool && transform &&
         createPortal(
           <div
@@ -166,6 +198,25 @@ export default function TransformObjectGUI({ selectedIds }) {
             <strong style={{ textTransform: 'capitalize', fontSize: '13px', display: 'block', marginBottom: '6px' }}>
               {activeTool} Controls
             </strong>
+
+            {/* Lock Toggle for Scale */}
+            {activeTool === 'scale' && (
+              <div style={{ marginBottom: '8px' }}>
+                <button
+                  onClick={handleScaleLockToggle}
+                  style={{
+                    backgroundColor: scaleLocked ? '#bbb' : '#eee',
+                    border: '1px solid #888',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    padding: '4px 8px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {scaleLocked ? '🔒 Locked' : '🔓 Unlocked'}
+                </button>
+              </div>
+            )}
 
             {['x', 'y', 'z'].map((axis) => (
               <div
@@ -201,12 +252,11 @@ export default function TransformObjectGUI({ selectedIds }) {
                     textAlign: 'right',
                   }}
                 />
-                <button style={stepperBtn} onClick={() => updateValue(activeTool, axis, activeTool === 'rotate' ? -30 : -1)}>−</button>
-                <button style={stepperBtn} onClick={() => updateValue(activeTool, axis, activeTool === 'rotate' ? 30 : 1)}>+</button>
+                <button style={stepperBtn} onClick={() => updateValue(activeTool, axis, activeTool === 'rotate' ? -30 : -0.1)}>−</button>
+                <button style={stepperBtn} onClick={() => updateValue(activeTool, axis, activeTool === 'rotate' ? 30 : 0.1)}>+</button>
               </div>
             ))}
 
-            {/* ✅ Reset Button */}
             <div style={{ marginTop: '8px' }}>
               <button
                 onClick={resetTool}
