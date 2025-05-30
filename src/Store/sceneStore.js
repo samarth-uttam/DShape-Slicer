@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export const useSceneStore = create((set) => ({
   // Currently selected plate ID
-  selectedPlateId: 'Plate 1',
+  selectedPlateId: 'Plate 2',
 
   // Initial scene structure with 3 plates
   plates: [
@@ -86,7 +86,7 @@ export const useSceneStore = create((set) => ({
           rotation: [0, 0, 0],
           scale: [1, 1, 1],
           original: {
-            position: [-2, -1, 0],
+            position: [-20, -1, 0],
             rotation: [0, 0, 0],
             scale: [1, 1, 1],
           },

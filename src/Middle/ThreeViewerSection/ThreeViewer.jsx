@@ -1,7 +1,7 @@
 
 // clearing the console for debugging purposes. Chrome does not clear the console when you refresh the page.
 // this is a workaround to clear the console when the page is refreshed.
-console.clear()
+console.clear() 
 
 
 //importing standard libraries 
@@ -216,24 +216,7 @@ function ThickAxes({ x_length = 5 , y_length  = 5 , z_length = 5, radius = 0.05 
 }
 
 
-// Function for the cubes that i can play with - 
-// they can accept click 
 
-// function FirstCube({ position = [1, 1, 1], selected, onClick }) {
-//   return (
-//     <mesh
-//       position={position}
-//       onClick={(e) => {
-//         e.stopPropagation(); // prevent canvas click deselect
-//         onClick();
-//       }}
-//     >
-//       <boxGeometry args={[5, 5, 5]} />
-//       <meshStandardMaterial color={selected ? 'orange' : 'skyblue'} />
-//       <Edges color={selected ? '#ff9900' : 'black'} />
-//     </mesh>
-//   );
-// }
 
 function FirstCube({ transform, selected, onClick }) {
   return (
@@ -254,21 +237,6 @@ function FirstCube({ transform, selected, onClick }) {
 }
 
 
-// function SecondCube({ position = [10, 5, 1], selected, onClick }) {
-//   return (
-//     <mesh
-//       position={position}
-//       onClick={(e) => {
-//         e.stopPropagation();
-//         onClick();
-//       }}
-//     >
-//       <boxGeometry args={[5, 5, 5]} />
-//       <meshStandardMaterial color={selected ? 'orange' : 'green'} />
-//       <Edges color={selected ? '#ff9900' : 'black'} />
-//     </mesh>
-//   );
-// }
 
 function SecondCube({ transform, selected, onClick }) {
   return (
@@ -580,6 +548,65 @@ function CameraLogger() {
 
 
 
+function PlateControlsPanel({ plates, selectedPlateId, setSelectedPlateId }) {
+  return (
+    <div style={{ position: 'absolute', top: 200, left: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
+      {/* Vertical Plate Menu */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <span style={{ fontFamily: 'monospace', fontSize: '14px', marginBottom: '2px' }}>Select Plate:</span>
+        {plates.map((plate) => (
+          <button
+            key={plate.id}
+            onClick={() => setSelectedPlateId(plate.id)}
+            style={{
+              padding: '6px 12px',
+              fontSize: '13px',
+              fontFamily: 'monospace',
+              borderRadius: '6px',
+              border: selectedPlateId === plate.id ? '2px solid #000' : '1px solid #aaa',
+              backgroundColor: selectedPlateId === plate.id ? '#e6e6e6' : '#f7f7f7',
+              cursor: 'pointer',
+              textAlign: 'left',
+              width: '120px',
+            }}
+          >
+            {plate.id}
+          </button>
+        ))}
+      </div>
+
+      {/* Export Button */}
+      <button
+        onClick={() => {
+          const { plates, selectedPlateId } = useSceneStore.getState();
+          const exportData = { plates, selectedPlateId };
+          const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+            type: 'application/json',
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'sceneStoreExport.json';
+          a.click();
+          URL.revokeObjectURL(url);
+        }}
+        style={{
+          padding: '6px 12px',
+          fontSize: '13px',
+          fontFamily: 'monospace',
+          borderRadius: '6px',
+          border: '1px solid #aaa',
+          backgroundColor: '#f0e7e7',
+          cursor: 'pointer',
+          width: '120px',
+        }}
+      >
+        📦 Export Scene
+      </button>
+    </div>
+  );
+}
 
 // This is the main threeviewer Function 
 
@@ -632,65 +659,9 @@ const currentPlate = plates.find((p) => p.id === selectedPlateId);
       
       <>
 
+{/* <div style={{ position: 'absolute', top: 200, left: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
 
-{/* 
-<div style={{ position: 'absolute', top: 200, left: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
 
- 
-  <label style={{ fontFamily: 'monospace', fontSize: '14px' }}>
-    Select Plate:
-    <select
-      style={{
-        marginLeft: '10px',
-        padding: '4px 8px',
-        fontSize: '14px',
-        borderRadius: '6px',
-        border: '1px solid #aaa',
-      }}
-      value={selectedPlateId}
-      onChange={(e) => setSelectedPlateId(e.target.value)}
-    >
-      {plates.map((plate) => (
-        <option key={plate.id} value={plate.id}>
-          {plate.id}
-        </option>
-      ))}
-    </select>
-  </label>
-
- 
-  <button
-    onClick={() => {
-      const { plates, selectedPlateId } = useSceneStore.getState();
-      const exportData = { plates, selectedPlateId };
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: 'application/json',
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'sceneStoreExport.json';
-      a.click();
-      URL.revokeObjectURL(url);
-    }}
-    style={{
-      padding: '6px 12px',
-      fontSize: '13px',
-      fontFamily: 'monospace',
-      borderRadius: '6px',
-      border: '1px solid #aaa',
-      backgroundColor: '#f7f7f7',
-      cursor: 'pointer',
-      alignSelf: 'flex-start',
-    }}
-  >
-    📦 Export Scene Store
-  </button>
-</div> */}
-
-<div style={{ position: 'absolute', top: 200, left: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-
-  {/* Vertical Plate Menu */}
   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
     <span style={{ fontFamily: 'monospace', fontSize: '14px', marginBottom: '2px' }}>Select Plate:</span>
     {plates.map((plate) => (
@@ -714,7 +685,7 @@ const currentPlate = plates.find((p) => p.id === selectedPlateId);
     ))}
   </div>
 
-  {/* Export Button */}
+ 
   <button
     onClick={() => {
       const { plates, selectedPlateId } = useSceneStore.getState();
@@ -742,7 +713,13 @@ const currentPlate = plates.find((p) => p.id === selectedPlateId);
   >
     📦 Export Scene
   </button>
-</div>
+</div> */}
+
+<PlateControlsPanel
+  plates={plates}
+  selectedPlateId={selectedPlateId}
+  setSelectedPlateId={setSelectedPlateId}
+/>
 
 
 <SceneCanvas onPointerMissed={() => {
@@ -774,35 +751,6 @@ const currentPlate = plates.find((p) => p.id === selectedPlateId);
       <ThickAxes x_length={20} y_length={40} z_length={10} radius={0.02} />
       {/* <CameraLogger /> */}
 
-
-{/* <FirstCube
-  position={[5, 15, 1]}
-selected={selectedIds.includes('first')}
-  onClick={() => {
-    console.log('🟦 First Cube selected');
-setSelectedIds([ 'first' ])  }}
-/>
-
-<SecondCube
-  position={[10, 5, 1]}
-selected={selectedIds.includes('second')}
-  onClick={() => {
-    console.log('🟩 Second Cube selected');
-setSelectedIds([ 'second' ])  }}
-/> */}
-
-{/* 
-<FirstCube
-  transform={objectTransforms['first']}
-  selected={selectedIds.includes('first')}
-  onClick={() => setSelectedIds(['first'])}
-/>
-
-<SecondCube
-  transform={objectTransforms['second']}
-  selected={selectedIds.includes('second')}
-  onClick={() => setSelectedIds(['second'])}
-/> */}
 
 {currentPlate?.objects.map((obj) => {
   const isSelected = selectedIds.includes(obj.id);
@@ -906,12 +854,7 @@ setSelectedIds([ 'second' ])  }}
 
 <TransformObjectGUI selectedIds={selectedIds} />
 
-{/* <TransformObjectGUI selectedIds={selectedIds} /> */}
-{/* <TransformObjectGUI
-  selectedIds={selectedIds}
-  objectTransforms={objectTransforms}
-  setObjectTransforms={setObjectTransforms}
-/> */}
+
 
 
       {showWelcome && <WelcomeToast ref={welcomeRef} />}
