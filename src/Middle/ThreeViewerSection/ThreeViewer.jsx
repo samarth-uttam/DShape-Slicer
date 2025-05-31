@@ -28,6 +28,9 @@ import DarkModeToggle from './CustomGUI/DarkModeToggle'
 import * as initConfig from '../../config/InitConfig';
 import TransformObjectGUI from './CustomGUI/TransformObjectGUI';
 import { useSceneStore } from '../../Store/sceneStore';
+import STLModel from './scene/STLmodel';
+import ObjectsPanel  from './CustomGUI/ObjectsPanel';
+import PlateControlsPanel from './CustomGUI/PlateControlsPanel';
 
 
 // import temp_01 from '../../tempFunctions/temp_01.jsx';
@@ -548,65 +551,65 @@ function CameraLogger() {
 
 
 
-function PlateControlsPanel({ plates, selectedPlateId, setSelectedPlateId }) {
-  return (
-    <div style={{ position: 'absolute', top: 200, left: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+// function PlateControlsPanel({ plates, selectedPlateId, setSelectedPlateId }) {
+//   return (
+//     <div style={{ position: 'absolute', top: 200, left: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px' }}>
 
-      {/* Vertical Plate Menu */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        <span style={{ fontFamily: 'monospace', fontSize: '14px', marginBottom: '2px' }}>Select Plate:</span>
-        {plates.map((plate) => (
-          <button
-            key={plate.id}
-            onClick={() => setSelectedPlateId(plate.id)}
-            style={{
-              padding: '6px 12px',
-              fontSize: '13px',
-              fontFamily: 'monospace',
-              borderRadius: '6px',
-              border: selectedPlateId === plate.id ? '2px solid #000' : '1px solid #aaa',
-              backgroundColor: selectedPlateId === plate.id ? '#e6e6e6' : '#f7f7f7',
-              cursor: 'pointer',
-              textAlign: 'left',
-              width: '120px',
-            }}
-          >
-            {plate.id}
-          </button>
-        ))}
-      </div>
+//       {/* Vertical Plate Menu */}
+//       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+//         <span style={{ fontFamily: 'monospace', fontSize: '14px', marginBottom: '2px' }}>Select Plate:</span>
+//         {plates.map((plate) => (
+//           <button
+//             key={plate.id}
+//             onClick={() => setSelectedPlateId(plate.id)}
+//             style={{
+//               padding: '6px 12px',
+//               fontSize: '13px',
+//               fontFamily: 'monospace',
+//               borderRadius: '6px',
+//               border: selectedPlateId === plate.id ? '2px solid #000' : '1px solid #aaa',
+//               backgroundColor: selectedPlateId === plate.id ? '#e6e6e6' : '#f7f7f7',
+//               cursor: 'pointer',
+//               textAlign: 'left',
+//               width: '120px',
+//             }}
+//           >
+//             {plate.id}
+//           </button>
+//         ))}
+//       </div>
 
-      {/* Export Button */}
-      <button
-        onClick={() => {
-          const { plates, selectedPlateId } = useSceneStore.getState();
-          const exportData = { plates, selectedPlateId };
-          const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-            type: 'application/json',
-          });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'sceneStoreExport.json';
-          a.click();
-          URL.revokeObjectURL(url);
-        }}
-        style={{
-          padding: '6px 12px',
-          fontSize: '13px',
-          fontFamily: 'monospace',
-          borderRadius: '6px',
-          border: '1px solid #aaa',
-          backgroundColor: '#f0e7e7',
-          cursor: 'pointer',
-          width: '120px',
-        }}
-      >
-        📦 Export Scene
-      </button>
-    </div>
-  );
-}
+//       {/* Export Button */}
+//       <button
+//         onClick={() => {
+//           const { plates, selectedPlateId } = useSceneStore.getState();
+//           const exportData = { plates, selectedPlateId };
+//           const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+//             type: 'application/json',
+//           });
+//           const url = URL.createObjectURL(blob);
+//           const a = document.createElement('a');
+//           a.href = url;
+//           a.download = 'sceneStoreExport.json';
+//           a.click();
+//           URL.revokeObjectURL(url);
+//         }}
+//         style={{
+//           padding: '6px 12px',
+//           fontSize: '13px',
+//           fontFamily: 'monospace',
+//           borderRadius: '6px',
+//           border: '1px solid #aaa',
+//           backgroundColor: '#f0e7e7',
+//           cursor: 'pointer',
+//           width: '120px',
+//         }}
+//       >
+//         📦 Export Scene
+//       </button>
+//     </div>
+//   );
+// }
 
 // This is the main threeviewer Function 
 
@@ -620,18 +623,7 @@ function ThreeViewer() {
 
       const [selectedIds, setSelectedIds] = useState([])
 
-      const [objectTransforms, setObjectTransforms] = useState({
-      first: {
-        position: [5, 15, 1],
-        rotation: [0, 0, 0],
-        scale: [1, 1, 1],
-      },
-      second: {
-        position: [10, 5, 1],
-        rotation: [0, 0, 0],
-        scale: [1, 1, 1],
-      },
-      });
+ 
 
       const [sceneColor, setSceneColor] = useState(initConfig.INITIAL_SCENE_COLOR);
       const [showWelcome, setShowWelcome] = useState(true);
@@ -645,10 +637,96 @@ function ThreeViewer() {
         }
       };
 
+      const [objectCounts, setObjectCounts] = useState([
+        { name: 'Cube', count: 0 },
+        { name: 'Sphere', count: 0 },
+        { name: 'Banana', count: 0 },
+        { name: 'Cone', count: 0 },
+      ]);
+    
+      const handleAdd = async (name) => {
+        const count = objectCounts.find((obj) => obj.name === name)?.count || 0;
+        const currentPlate = plates.find((p) => p.id === selectedPlateId);
+      
+        try {
+          const response = await fetch('http://localhost:5001/get-object-transform', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: name.toLowerCase(),
+              count,
+              plateId: selectedPlateId,
+              existingObjects: currentPlate.objects,
+            }),
+          });
+      
+          const obj = await response.json();
+          const newId = `${obj.type}_${Date.now()}`;
+      
+          useSceneStore.setState((prev) => {
+            const newPlates = prev.plates.map((plate) =>
+              plate.id === selectedPlateId
+                ? {
+                    ...plate,
+                    objects: [
+                      ...plate.objects,
+                      {
+                        id: newId,
+                        type: 'stl', // ✅ force type to 'stl'
+                        name: obj.type, // ✅ store original name like 'banana' (optional)
+                        position: obj.position,
+                        rotation: obj.rotation,
+                        scale: obj.scale,
+                        original: {
+                          position: obj.position,
+                          rotation: obj.rotation,
+                          scale: obj.scale,
+                        },
+                        ...(obj.filename ? { filename: obj.filename } : {}),
+                      },
+                    ],
+                  }
+                : plate
+            );
+       
+            return { plates: newPlates };
+            
+          });
+
+          console.log(
+            `✅ Added "${obj.type}" to plate "${selectedPlateId}" as "${newId}"\n` +
+            `↪ Position: [${obj.position.join(', ')}]\n` +
+            `↪ Rotation: [${obj.rotation.join(', ')}]\n` +
+            `↪ Scale: [${obj.scale.join(', ')}]`
+
+          );
+      
+          setObjectCounts((prev) =>
+            prev.map((obj) =>
+              obj.name === name ? { ...obj, count: obj.count + 1 } : obj
+            )
+          );
+        } catch (error) {
+          console.error('❌ Error talking to Python backend:', error);
+        }
+      };
+      
+
+
+
+      const handleRemove = (name) => {
+        setObjectCounts((prev) =>
+          prev.map((obj) =>
+            obj.name === name ? { ...obj, count: Math.max(0, obj.count - 1) } : obj
+          )
+        );
+      };
+
 
 // Get the current plate (null if not found)
 const currentPlate = plates.find((p) => p.id === selectedPlateId);
 
+const availableObjectTypes = ['cube', 'sphere', 'cone', 'banana']; // You can extend this list
 
 
 
@@ -715,6 +793,13 @@ const currentPlate = plates.find((p) => p.id === selectedPlateId);
   </button>
 </div> */}
 
+
+<ObjectsPanel
+        objects={objectCounts}
+        onAdd={handleAdd}
+        onRemove={handleRemove}
+      />
+
 <PlateControlsPanel
   plates={plates}
   selectedPlateId={selectedPlateId}
@@ -740,7 +825,7 @@ const currentPlate = plates.find((p) => p.id === selectedPlateId);
 
 
       <SetZUpCamera />
-      <directionalLight position={[2, 2, 2]} />
+      <directionalLight position={[10, 10, 10]} intensity={1} />
       <BasePlateWithGridCombined 
           x_width={initConfig.INITIAL_BUILD_PLATE_x}
           y_width={initConfig.INITIAL_BUILD_PLATE_y }
@@ -755,6 +840,20 @@ const currentPlate = plates.find((p) => p.id === selectedPlateId);
 {currentPlate?.objects.map((obj) => {
   const isSelected = selectedIds.includes(obj.id);
   const transform = obj;
+
+  if (obj.type === 'stl') {
+    return (
+      <STLModel
+        key={obj.id}
+path={`/DShape-Slicer/${obj.filename}`}  // ✅ becomes /DShape-Slicer/models/banana.stl
+        position={obj.position}
+        rotation={obj.rotation}
+        scale={obj.scale}
+        selected={selectedIds.includes(obj.id)}
+        onClick={() => setSelectedIds([obj.id])}
+      />
+    );
+  }
 
   if (obj.type === 'cube') {
     return (
